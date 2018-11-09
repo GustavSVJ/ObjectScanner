@@ -7,11 +7,32 @@
 #include "highgui.h" 
 #include <conio.h> 
 
-int main(int argc, char* argv[]) {
-	printf("Hello World!\n");
-	InputFiles tester = InputFiles();
+using namespace cv;
+using namespace std;
 
-	string paths[100];
-	tester.findFiles("C:\\Users\\s164846\\Desktop", paths);
+int main(int argc, char* argv[]) {
+
+	InputHandler inputHandler = InputHandler();
+
+	if (inputHandler.CheckArguments(argc, argv)) {
+		return 1;
+	}
+
+	if (!inputHandler.findFiles(argv[1])) {
+		printf("No image files where found :/\n");
+		return 1;
+	}
+	
+	for (int i = 0; inputHandler.paths[i] != ""; i++) {
+		Mat image;
+		image = imread(inputHandler.paths[i], CV_LOAD_IMAGE_COLOR);
+		
+		namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
+		imshow("Display window", image);                   // Show our image inside it.
+
+		waitKey(0);                                          // Wait for a keystroke in the window
+		//Do some image processing!
+	}
+	return 0;
 
 }
