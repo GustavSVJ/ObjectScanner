@@ -1,4 +1,4 @@
-#include "FileHandler.hpp"
+#include "InputHandler.hpp"
 
 #include <string>
 #include <iostream>
@@ -26,6 +26,9 @@ InputHandler::InputHandler() {
 	memset(paths, NULL, MAX_INPUT_FILES);
 }
 
+InputHandler::~InputHandler() {
+}
+
 int InputHandler::CheckIfDirExists(const fs::path& p)
 {
 	if (fs::exists(p))
@@ -35,23 +38,29 @@ int InputHandler::CheckIfDirExists(const fs::path& p)
 }
 
 int InputHandler::CheckArguments(int argc, char* argv[]) {
-	if (argc < 2) {
-		printf("Did you remember to enter an argument when launching the program?\n");
+	if (argc < 3) {
+		printf("Did you remember to enter two arguments when launching the program?\n");
 		return 1;
 	}
 
-	else if (argc > 2) {
-		printf("There was more than one argument entered... THAT IS UNACCEPTABLE!\n");
+	else if (argc > 3) {
+		printf("There was more than two argument entered... THAT IS UNACCEPTABLE!\n");
 		return 1;
 	}
 
 	else if (CheckIfDirExists(argv[1])) {
-		printf("The directory entered doesn't exist!\n");
-		printf("The program check the path: %c\n", argv[1]);
+		printf("The input directory entered doesn't exist!\n");
+		printf("The program checked the path: %c\n", argv[1]);
+		return 1;
+	}
+
+	else if (CheckIfDirExists(argv[2])) {
+		printf("The output directory entered doesn't exist!\n");
+		printf("The program checked the path: %c\n", argv[2]);
 		return 1;
 	}
 	else {
-		printf("The entered argument is accepted. You may procede!\n");
+		printf("The entered arguments are accepted. You may procede!\n");
 		return 0;
 	}
 }

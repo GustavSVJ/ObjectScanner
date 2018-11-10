@@ -1,7 +1,8 @@
-#include "FileHandler.hpp"
+#include "InputHandler.hpp"
+#include "OutputHandler.hpp"
 
 #include <stdio.h>
-#include <string.h>
+#include <string>
 #include "cv.h" 
 #include "cxcore.h" 
 #include "highgui.h" 
@@ -33,6 +34,20 @@ int main(int argc, char* argv[]) {
 		waitKey(0);                                          // Wait for a keystroke in the window
 		//Do some image processing!
 	}
+	
+	OutputHandler cube = OutputHandler();
+
+	cube.AddPoint(0, 0, 0);
+	cube.AddPoint(0, 0, 2);
+	cube.AddPoint(0, 2, 2);
+	cube.AddPoint(0, 2, 0);
+	cube.AddPoint(2, 0, 0);
+	cube.AddPoint(2, 0, 2);
+	cube.AddPoint(2, 2, 2);
+	cube.AddPoint(2, 2, 0);
+
+	cube.WriteFile(argv[2]);
+
 	return 0;
 
 }

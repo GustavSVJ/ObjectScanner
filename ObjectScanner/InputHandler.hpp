@@ -11,6 +11,7 @@ namespace fs = std::experimental::filesystem;
 class InputHandler {
 public:
 	InputHandler();
+	~InputHandler();
 
 	int findFiles(string dir);
 	string paths[MAX_INPUT_FILES];
