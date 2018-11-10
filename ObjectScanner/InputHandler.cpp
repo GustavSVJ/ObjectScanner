@@ -50,13 +50,13 @@ int InputHandler::CheckArguments(int argc, char* argv[]) {
 
 	else if (CheckIfDirExists(argv[1])) {
 		printf("The input directory entered doesn't exist!\n");
-		printf("The program checked the path: %c\n", argv[1]);
+		printf("The program checked the path: %s\n", argv[1]);
 		return 1;
 	}
 
 	else if (CheckIfDirExists(argv[2])) {
 		printf("The output directory entered doesn't exist!\n");
-		printf("The program checked the path: %c\n", argv[2]);
+		printf("The program checked the path: %s\n", argv[2]);
 		return 1;
 	}
 	else {
