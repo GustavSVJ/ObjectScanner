@@ -3,6 +3,10 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include "cv.h" 
+#include "cxcore.h" 
+#include "highgui.h" 
+#include <conio.h> 
 
 using namespace std;
 namespace fs = std::experimental::filesystem;
@@ -11,6 +15,7 @@ OutputHandler::OutputHandler()
 {
 	memset(points, NULL, MAX_OUTPUT_POINTS);
 	pointCounter = 0;
+	imageCounter = 0;
 }
 
 
@@ -49,3 +54,10 @@ int OutputHandler::WriteFile(string outputDir) {
 	return 0;
 }
 
+void OutputHandler::SaveImage(IplImage* frame) {
+	char filename[25];
+
+	sprintf(filename, "captures\\picture%d.png", imageCounter);
+	cvSaveImage(filename, frame);
+	imageCounter++;
+}

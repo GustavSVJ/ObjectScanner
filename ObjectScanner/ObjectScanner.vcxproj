@@ -132,11 +132,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DotMaker.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OutputHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DotMaker.hpp" />
     <ClInclude Include="InputHandler.hpp" />
     <ClInclude Include="OutputHandler.hpp" />
   </ItemGroup>
