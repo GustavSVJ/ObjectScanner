@@ -12,6 +12,43 @@
 using namespace cv;
 using namespace std;
 
+enum Direction { North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest };
+int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck);
+
+
+
+class Objects {
+
+private:
+	int ImageWidth;
+
+public:
+	Point topLeft, bottomRight;
+
+	Objects() {
+		topLeft = cvPoint(0,0);
+		bottomRight = cvPoint(0, 0);
+		ImageWidth = 0;
+	}
+
+	Objects(int imageHeight, int imageWidth) {
+		topLeft = cvPoint(imageHeight - 1, imageWidth - 1 );
+		bottomRight = cvPoint(0, 0);
+		ImageWidth = imageWidth;
+	}
+
+	void updateRoI(int pixel) {
+		int x = pixel % ImageWidth;
+		int y = pixel / ImageWidth;
+
+		if (topLeft.x + 2 > x) topLeft.x = x - 2;
+		if (topLeft.y + 2 > y) topLeft.y = y - 2;
+		if (bottomRight.x - 2 < x) bottomRight.x = x + 2;
+		if (bottomRight.y - 2 < y) bottomRight.y = y + 2;
+	}
+
+};
+
 int main(int argc, char* argv[]) {
 
 	InputHandler input = InputHandler();
@@ -86,7 +123,7 @@ int main(int argc, char* argv[]) {
 			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {
 				unsigned char pixelValue = (unsigned char)frameBinary->imageData[i];
 
-				if (pixelValue < 100) {
+				if (pixelValue < 15) {
 					frameBinary->imageData[i] = 0;
 				}
 				else {
@@ -98,15 +135,25 @@ int main(int argc, char* argv[]) {
 			cvShowImage("Binary Display", frameBinary);
 
 
-			int xTop = 0, xBottom = 0, yLeft = 0, yRight = 0;
-			enum Direction { North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest };
+			IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
+			cvSet(objectMarkings, cvScalar(0));
 
+			Objects RoI[300];
+			int RoICounter = 255;
 
 			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {
 				unsigned char pixelValue = (unsigned char)frameBinary->imageData[i];
+				unsigned char objectPixelValue = (unsigned char)objectMarkings->imageData[i];
+	
+				if (pixelValue && objectPixelValue == 0 && checkPixel(frameBinary, objectMarkings, i)) {
 
-				if (pixelValue) {
+					RoI[(unsigned char)objectMarkings->imageData[i]].updateRoI(i);
+					frameBinary->imageData[i] = 150;
+				}
+		
+				else if (pixelValue && objectPixelValue == 0) {
 
+					RoI[RoICounter] = Objects(frameBinary->height, frameBinary->width);
 					int startPixel = i;
 					int currentPixel = startPixel;
 					int pixelToCheck = -1;
@@ -114,6 +161,8 @@ int main(int argc, char* argv[]) {
 					char moveOn = 0;
 
 					while (startPixel != pixelToCheck) {
+						objectMarkings->imageData[currentPixel] = RoICounter;
+						RoI[(unsigned char)objectMarkings->imageData[currentPixel]].updateRoI(i);
 						int firstToCheck = movingTowards - 2;
 						if (firstToCheck < 0) {
 							firstToCheck += 8;
@@ -125,61 +174,175 @@ int main(int argc, char* argv[]) {
 							switch (lookingAt) {
 							case North:
 								pixelToCheck = currentPixel - frameBinary->width;
-								if (!(pixelToCheck < 0) && (unsigned char)frameBinary->imageData[pixelToCheck] == 1) {
+								if (!(pixelToCheck < 0) && (unsigned char)frameBinary->imageData[pixelToCheck] != 0) {
 									moveOn = 1;
 									currentPixel = pixelToCheck;
 									movingTowards = North;
 								}
-								else if (firstToCheck != NorthEast){
+								else if (firstToCheck != NorthEast) {
 									lookingAt = NorthEast;
 								}
 								else {
 									moveOn = 1;
 									movingTowards = East;
-									currentPixel++;
+									startPixel = pixelToCheck;
+									printf("Error!");
 								}
 								break;
 							case NorthEast:
-								printf("NorthEast");
+								pixelToCheck = currentPixel - frameBinary->width + 1;
+								if (!(pixelToCheck < 0) && (unsigned char)frameBinary->imageData[pixelToCheck] != 0) {
+									moveOn = 1;
+									currentPixel = pixelToCheck;
+									movingTowards = NorthEast;
+
+								}
+								else if (firstToCheck != East) {
+									lookingAt = East;
+								}
+								else {
+									moveOn = 1;
+									movingTowards = East;
+									startPixel = pixelToCheck;
+									printf("Error!");
+								}
 								break;
 							case East:
-								printf("East");
+								pixelToCheck = currentPixel + 1;
+								if (!(pixelToCheck > frameBinary->width*frameBinary->height) && (unsigned char)frameBinary->imageData[pixelToCheck] != 0) {
+									moveOn = 1;
+									currentPixel = pixelToCheck;
+									movingTowards = East;
+
+								}
+								else if (firstToCheck != SouthEast) {
+									lookingAt = SouthEast;
+								}
+								else {
+									moveOn = 1;
+									movingTowards = East;
+									startPixel = pixelToCheck;
+									printf("Error!");
+								}
 								break;
 							case SouthEast:
-								printf("SouthEast");
+								pixelToCheck = currentPixel + frameBinary->width + 1;
+								if (!(pixelToCheck > frameBinary->width*frameBinary->height) && (unsigned char)frameBinary->imageData[pixelToCheck] != 0) {
+									moveOn = 1;
+									currentPixel = pixelToCheck;
+									movingTowards = SouthEast;
+								}
+								else if (firstToCheck != South) {
+									lookingAt = South;
+								}
+								else {
+									moveOn = 1;
+									movingTowards = East;
+									startPixel = pixelToCheck;
+									printf("Error!");
+								}
 								break;
 							case South:
-								printf("South");
+								pixelToCheck = currentPixel + frameBinary->width;
+								if (!(pixelToCheck > frameBinary->width*frameBinary->height) && (unsigned char)frameBinary->imageData[pixelToCheck] != 0) {
+									moveOn = 1;
+									currentPixel = pixelToCheck;
+									movingTowards = South;
+								}
+								else if (firstToCheck != SouthWest) {
+									lookingAt = SouthWest;
+								}
+								else {
+									moveOn = 1;
+									movingTowards = East;
+									startPixel = pixelToCheck;
+									printf("Error!");
+								}
 								break;
 							case SouthWest:
-								printf("SouthWest");
+								pixelToCheck = currentPixel + frameBinary->width - 1;
+								if (!(pixelToCheck > frameBinary->width*frameBinary->height) && (unsigned char)frameBinary->imageData[pixelToCheck] != 0) {
+									moveOn = 1;
+									currentPixel = pixelToCheck;
+									movingTowards = SouthWest;
+								}
+								else if (firstToCheck != West) {
+									lookingAt = West;
+								}
+								else {
+									moveOn = 1;
+									movingTowards = East;
+									startPixel = pixelToCheck;
+									printf("Error!");
+								}
 								break;
 							case West:
-								printf("West");
+								pixelToCheck = currentPixel - 1;
+								if (!(pixelToCheck < 0) && (unsigned char)frameBinary->imageData[pixelToCheck] != 0) {
+									moveOn = 1;
+									currentPixel = pixelToCheck;
+									movingTowards = West;
+								}
+								else if (firstToCheck != NorthWest) {
+									lookingAt = NorthWest;
+								}
+								else {
+									moveOn = 1;
+									movingTowards = East;
+									startPixel = pixelToCheck;
+									printf("Error!");
+								}
 								break;
 							case NorthWest:
-								printf("NorthWest");
+								pixelToCheck = currentPixel - frameBinary->width - 1;
+								if (!(pixelToCheck < 0) && (unsigned char)frameBinary->imageData[pixelToCheck] != 0) {
+									moveOn = 1;
+									currentPixel = pixelToCheck;
+									movingTowards = NorthWest;
+								}
+								else if (firstToCheck != North) {
+									lookingAt = North;
+								}
+								else {
+									moveOn = 1;
+									movingTowards = East;
+									startPixel = pixelToCheck;
+									printf("Error!");
+								}
 								break;
 							default:
 								printf("Error!");
 								break;
 							}
 						}
-
+						//cvShowImage("Capture Display", objectMarkings);
 						moveOn = 0;
 					}
-
-
-
-
-
-
-
-
+				
+					RoICounter--;
 
 				}
 
 			}
+			
+			for (int i = 255; i > RoICounter; i--) {
+				cvRectangle(frameBinary, RoI[i].topLeft, RoI[i].bottomRight, CV_RGB(0, 0, 255), 1, 8);
+			}
+
+			for (int i = 0; i < objectMarkings->width*objectMarkings->height; i++) {
+				unsigned char pixelValue = (unsigned char)objectMarkings->imageData[i];
+				if (pixelValue == 2) {
+					Point pt = cvPoint(i % objectMarkings->width, i / objectMarkings->width);
+					cvLine(frameColor, pt, pt, CV_RGB(255, 255, 0), 1, 8);
+				}
+				else if (pixelValue == 255) {
+					Point pt = cvPoint(i % objectMarkings->width, i / objectMarkings->width);
+					cvLine(frameColor, pt, pt, CV_RGB(255, 0, 0), 1, 8);
+				}
+			
+			}
+			printf("Done!");
+
 
 		}
 
@@ -190,3 +353,61 @@ int main(int argc, char* argv[]) {
 
 }
 
+
+
+/*
+int checkPixel(IplImage *image, int pixelToCheck, int *currentPixel, int firstToCheck, Direction *movingTowards, int *lookingAt) {
+	if (!(pixelToCheck < 0) && (unsigned char)image->imageData[pixelToCheck] == 1) {
+		*currentPixel = pixelToCheck;
+		*movingTowards = North;
+		//cvCircle(frameColor, cvPoint(*currentPixel / frameBinary->width, *currentPixel % frameBinary->width), 1, CV_RGB(0, 0, 255), 1, 8);
+		return 1;
+	}
+	else if (firstToCheck != NorthEast) {
+		*lookingAt = NorthEast;
+		return 0;
+	}
+	else {
+		*movingTowards = East;
+		*currentPixel++;
+		printf("Error!");
+		return 1;
+	}
+}
+
+*/
+
+
+int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck) {
+
+	int borderPixelToCheck = 0;
+
+	for (int i = -1; i < 2; i++) {
+		borderPixelToCheck = pixelToCheck - inputImage->width + i;
+		if (borderPixelToCheck > 0 && outputImage->imageData[borderPixelToCheck] != 0) {
+			outputImage->imageData[pixelToCheck] = outputImage->imageData[borderPixelToCheck];
+			return 1;
+		}
+	}
+
+	borderPixelToCheck = pixelToCheck + 1;
+	if (borderPixelToCheck < inputImage->width * inputImage->height && outputImage->imageData[borderPixelToCheck] != 0) {
+		outputImage->imageData[pixelToCheck] = outputImage->imageData[borderPixelToCheck];
+		return 1;
+	}
+
+	borderPixelToCheck = pixelToCheck - 1;
+	if (borderPixelToCheck > 0 && outputImage->imageData[borderPixelToCheck] != 0) {
+		outputImage->imageData[pixelToCheck] = outputImage->imageData[borderPixelToCheck];
+		return 1;
+	}
+
+	for (int i = -1; i < 2; i++) {
+		borderPixelToCheck = pixelToCheck + inputImage->width + i;
+		if (borderPixelToCheck < inputImage->width * inputImage->height && outputImage->imageData[borderPixelToCheck] != 0) {
+			outputImage->imageData[pixelToCheck] = outputImage->imageData[borderPixelToCheck];
+			return 1;
+		}
+	}
+	return 0;
+}

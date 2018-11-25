@@ -31,3 +31,5 @@ void DotMaker::ShowImage() {
 	namedWindow("Dot Display", WINDOW_AUTOSIZE);
 	imshow("Dot Display", img);
 }
+
+

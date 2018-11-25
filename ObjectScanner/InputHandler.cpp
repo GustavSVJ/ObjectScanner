@@ -76,6 +76,7 @@ int InputHandler::CheckArguments(int argc, char* argv[]) {
 		printf("The entered arguments are accepted. You may procede!\n");
 		return 0;
 	}
+	return 1;
 }
 
 IplImage* InputHandler::WebcamCapture(int deviceID) {
