@@ -1,6 +1,7 @@
 #include "InputHandler.hpp"
 #include "OutputHandler.hpp"
 #include "DotMaker.hpp"
+#include "ObjectAnalyser.h"
 
 #include <stdio.h>
 #include <string>
@@ -15,80 +16,6 @@ using namespace std;
 enum Direction { North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest };
 int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck);
 
-
-
-class Objects {
-
-private:
-	int ImageWidth;
-
-public:
-	Point topLeft, bottomRight;
-
-
-	Objects() {
-		topLeft = cvPoint(0, 0);
-		bottomRight = cvPoint(0, 0);
-		ImageWidth = 0;
-	}
-
-	Objects(int imageHeight, int imageWidth) {
-		topLeft = cvPoint(imageHeight - 1, imageWidth - 1);
-		bottomRight = cvPoint(0, 0);
-		ImageWidth = imageWidth;
-	}
-
-	void updateRoI(int pixel) {
-		int x = pixel % ImageWidth;
-		int y = pixel / ImageWidth;
-
-		if (topLeft.x + 2 > x) topLeft.x = x - 2;
-		if (topLeft.y + 2 > y) topLeft.y = y - 2;
-		if (bottomRight.x - 2 < x) bottomRight.x = x + 2;
-		if (bottomRight.y - 2 < y) bottomRight.y = y + 2;
-	}
-
-	int getObjectHeight() {
-		return bottomRight.y - topLeft.y - 1;
-	}
-
-	int getObjectWidth() {
-		return bottomRight.x - topLeft.x - 1;
-	}
-
-	IplImage * getObjectImage(IplImage * fullImage, IplImage * objectImage) {
-
-		int fullImageStartPixel = (topLeft.x * topLeft.y);
-		int fullImageEndPixel = ((bottomRight.x - topLeft.x) * (bottomRight.y - topLeft.y));
-
-		for (int j = 0; j < objectImage->height; j++) {
-			int firstPixel = (topLeft.y + 1 + j) * 1920 + (topLeft.x + 1);
-
-			for (int i = 0; i < objectImage->width; i++) {
-				objectImage->imageData[i + j * (objectImage->widthStep)] = fullImage->imageData[i + firstPixel];
-				fullImage->imageData[i + firstPixel] = 100;
-			}
-		}
-
-		return objectImage;
-
-
-		/*
-
-		for (int i = 0; i <= fullImageEndPixel; i += 3) {
-			objectImage->imageData[i] = (unsigned char)fullImage->imageData[i + fullImageStartPixel];
-			objectImage->imageData[i+1] = (unsigned char)fullImage->imageData[i + 1 + fullImageStartPixel];
-			objectImage->imageData[i+2] = (unsigned char)fullImage->imageData[i + 2 + fullImageStartPixel];
-
-			fullImage->imageData[i + fullImageStartPixel] = 100;
-			fullImage->imageData[i + 1 + fullImageStartPixel] = 100;
-			fullImage->imageData[i + 2 + fullImageStartPixel] = 100;
-		}
-
-		*/
-	}
-
-};
 
 int main(int argc, char* argv[]) {
 
@@ -179,8 +106,8 @@ int main(int argc, char* argv[]) {
 			IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
 			cvSet(objectMarkings, cvScalar(0));
 
-			Objects RoI[300];
-			int RoICounter = 255;
+			ObjectAnalyser RoI[50];
+			int RoICounter = 1;
 
 			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {
 				unsigned char pixelValue = (unsigned char)frameBinary->imageData[i];
@@ -188,13 +115,13 @@ int main(int argc, char* argv[]) {
 
 				if (pixelValue && objectPixelValue == 0 && checkPixel(frameBinary, objectMarkings, i)) {
 
-					RoI[(unsigned char)objectMarkings->imageData[i]].updateRoI(i);
+					RoI[(unsigned char)objectMarkings->imageData[i]].UpdateRoI(i);
 					frameBinary->imageData[i] = 150;
 				}
 
 				else if (pixelValue && objectPixelValue == 0) {
 
-					RoI[RoICounter] = Objects(frameBinary->height, frameBinary->width);
+					RoI[RoICounter] = ObjectAnalyser(frameBinary->height, frameBinary->width);
 					int startPixel = i;
 					int currentPixel = startPixel;
 					int pixelToCheck = -1;
@@ -203,7 +130,7 @@ int main(int argc, char* argv[]) {
 
 					while (startPixel != pixelToCheck) {
 						objectMarkings->imageData[currentPixel] = RoICounter;
-						RoI[(unsigned char)objectMarkings->imageData[currentPixel]].updateRoI(i);
+						RoI[(unsigned char)objectMarkings->imageData[currentPixel]].UpdateRoI(i);
 						int firstToCheck = movingTowards - 2;
 						if (firstToCheck < 0) {
 							firstToCheck += 8;
@@ -360,38 +287,27 @@ int main(int argc, char* argv[]) {
 						moveOn = 0;
 					}
 
-					RoICounter--;
+					RoICounter++;
 
 				}
-				   
+
 			}
 
 
-			IplImage* img[255];
-			IplImage * showTime;
+			IplImage* img;
 
-			for (int i = 255; i > RoICounter; i--) {
-				img[i] = cvCreateImage(cvSize(RoI[i].getObjectWidth(), RoI[i].getObjectHeight()), IPL_DEPTH_8U, 1);
-				cvRectangle(frameGrey, RoI[i].topLeft, RoI[i].bottomRight, CV_RGB(255, 255, 255), 1, 8);
+			for (int i = 1; i < RoICounter; i++) {
+				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
+				cvRectangle(frameGrey, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
 
-				RoI[i].getObjectImage(frameGrey, img[i]);
-				showTime = cvCloneImage(img[i]);
+				RoI[i].GetObjectImage(frameGrey, img);
+				CvPoint smallImageCenter = RoI[i].GetObjectCenter(img);
+				CvPoint bigImageCenter = cvPoint(smallImageCenter.x + 1 + RoI[i].TopLeft.x, smallImageCenter.y + 1 + RoI[i].TopLeft.y);
 
+				cvLine(img, smallImageCenter, smallImageCenter, cvScalar(255), 1, 8);
+				cvLine(frameColor, bigImageCenter, bigImageCenter, CV_RGB(255,0,0), 1, 8);
 
-				printf("hello!");
-				
-			}
-
-			for (int i = 0; i <= objectMarkings->width*objectMarkings->height; i++) {
-				unsigned char pixelValue = (unsigned char)objectMarkings->imageData[i];
-				if (pixelValue == 2) {
-					Point pt = cvPoint(i % objectMarkings->width, i / objectMarkings->width);
-					cvLine(frameColor, pt, pt, CV_RGB(255, 255, 0), 1, 8);
-				}
-				else if (pixelValue == 255) {
-					Point pt = cvPoint(i % objectMarkings->width, i / objectMarkings->width);
-					cvLine(frameColor, pt, pt, CV_RGB(255, 0, 0), 1, 8);
-				}
+				printf("Done!");
 
 			}
 			printf("Done!");
