@@ -25,14 +25,15 @@ private:
 public:
 	Point topLeft, bottomRight;
 
+
 	Objects() {
-		topLeft = cvPoint(0,0);
+		topLeft = cvPoint(0, 0);
 		bottomRight = cvPoint(0, 0);
 		ImageWidth = 0;
 	}
 
 	Objects(int imageHeight, int imageWidth) {
-		topLeft = cvPoint(imageHeight - 1, imageWidth - 1 );
+		topLeft = cvPoint(imageHeight - 1, imageWidth - 1);
 		bottomRight = cvPoint(0, 0);
 		ImageWidth = imageWidth;
 	}
@@ -45,6 +46,46 @@ public:
 		if (topLeft.y + 2 > y) topLeft.y = y - 2;
 		if (bottomRight.x - 2 < x) bottomRight.x = x + 2;
 		if (bottomRight.y - 2 < y) bottomRight.y = y + 2;
+	}
+
+	int getObjectHeight() {
+		return bottomRight.y - topLeft.y - 1;
+	}
+
+	int getObjectWidth() {
+		return bottomRight.x - topLeft.x - 1;
+	}
+
+	IplImage * getObjectImage(IplImage * fullImage, IplImage * objectImage) {
+
+		int fullImageStartPixel = (topLeft.x * topLeft.y);
+		int fullImageEndPixel = ((bottomRight.x - topLeft.x) * (bottomRight.y - topLeft.y));
+
+		for (int j = 0; j < objectImage->height; j++) {
+			int firstPixel = (topLeft.y + 1 + j) * 1920 + (topLeft.x + 1);
+
+			for (int i = 0; i < objectImage->width; i++) {
+				objectImage->imageData[i + j * (objectImage->widthStep)] = fullImage->imageData[i + firstPixel];
+				fullImage->imageData[i + firstPixel] = 100;
+			}
+		}
+
+		return objectImage;
+
+
+		/*
+
+		for (int i = 0; i <= fullImageEndPixel; i += 3) {
+			objectImage->imageData[i] = (unsigned char)fullImage->imageData[i + fullImageStartPixel];
+			objectImage->imageData[i+1] = (unsigned char)fullImage->imageData[i + 1 + fullImageStartPixel];
+			objectImage->imageData[i+2] = (unsigned char)fullImage->imageData[i + 2 + fullImageStartPixel];
+
+			fullImage->imageData[i + fullImageStartPixel] = 100;
+			fullImage->imageData[i + 1 + fullImageStartPixel] = 100;
+			fullImage->imageData[i + 2 + fullImageStartPixel] = 100;
+		}
+
+		*/
 	}
 
 };
@@ -123,7 +164,7 @@ int main(int argc, char* argv[]) {
 			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {
 				unsigned char pixelValue = (unsigned char)frameBinary->imageData[i];
 
-				if (pixelValue < 15) {
+				if (pixelValue < 45) {
 					frameBinary->imageData[i] = 0;
 				}
 				else {
@@ -144,13 +185,13 @@ int main(int argc, char* argv[]) {
 			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {
 				unsigned char pixelValue = (unsigned char)frameBinary->imageData[i];
 				unsigned char objectPixelValue = (unsigned char)objectMarkings->imageData[i];
-	
+
 				if (pixelValue && objectPixelValue == 0 && checkPixel(frameBinary, objectMarkings, i)) {
 
 					RoI[(unsigned char)objectMarkings->imageData[i]].updateRoI(i);
 					frameBinary->imageData[i] = 150;
 				}
-		
+
 				else if (pixelValue && objectPixelValue == 0) {
 
 					RoI[RoICounter] = Objects(frameBinary->height, frameBinary->width);
@@ -318,18 +359,30 @@ int main(int argc, char* argv[]) {
 						//cvShowImage("Capture Display", objectMarkings);
 						moveOn = 0;
 					}
-				
+
 					RoICounter--;
 
 				}
-
+				   
 			}
-			
+
+
+			IplImage* img[255];
+			IplImage * showTime;
+
 			for (int i = 255; i > RoICounter; i--) {
-				cvRectangle(frameBinary, RoI[i].topLeft, RoI[i].bottomRight, CV_RGB(0, 0, 255), 1, 8);
+				img[i] = cvCreateImage(cvSize(RoI[i].getObjectWidth(), RoI[i].getObjectHeight()), IPL_DEPTH_8U, 1);
+				cvRectangle(frameGrey, RoI[i].topLeft, RoI[i].bottomRight, CV_RGB(255, 255, 255), 1, 8);
+
+				RoI[i].getObjectImage(frameGrey, img[i]);
+				showTime = cvCloneImage(img[i]);
+
+
+				printf("hello!");
+				
 			}
 
-			for (int i = 0; i < objectMarkings->width*objectMarkings->height; i++) {
+			for (int i = 0; i <= objectMarkings->width*objectMarkings->height; i++) {
 				unsigned char pixelValue = (unsigned char)objectMarkings->imageData[i];
 				if (pixelValue == 2) {
 					Point pt = cvPoint(i % objectMarkings->width, i / objectMarkings->width);
@@ -339,7 +392,7 @@ int main(int argc, char* argv[]) {
 					Point pt = cvPoint(i % objectMarkings->width, i / objectMarkings->width);
 					cvLine(frameColor, pt, pt, CV_RGB(255, 0, 0), 1, 8);
 				}
-			
+
 			}
 			printf("Done!");
 
