@@ -31,6 +31,8 @@ IplImage * ImageHandler::MakeBinary(IplImage * input, int threshold) {
 
 }
 
+IplImage * ImageHandler::RemoveBackground(IplImage * input, IplImage * background) {
+}
 
 //int ImageHandler::FindObjects()
 

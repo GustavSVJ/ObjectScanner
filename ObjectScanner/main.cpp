@@ -27,9 +27,27 @@ int main(int argc, char* argv[]) {
 
 	int fileCount = input.FindFiles(argv[1]);
 
+	/*
+
+	OutputHandler fileSaver = OutputHandler();
 	DotMaker dotImage = DotMaker();
-	dotImage.AddDots(900, 3, Scalar(255, 255, 255), 10);
-	dotImage.ShowImage();
+	
+	dotImage.DisplayBlackImage();
+	cvWaitKey(0);
+	IplImage *frameColor = input.WebcamCapture(1);
+	frameColor = input.WebcamCapture(1);
+	fileSaver.SaveImage(frameColor);
+
+	dotImage.Distance = 50;
+	
+	for (int i = 0; i < 6; i++) {
+		dotImage.DisplayDotImage(10 * i);
+		IplImage *frameColor = input.WebcamCapture(1);
+		fileSaver.SaveImage(frameColor);
+	}
+
+	return 0;
+	*/
 
 	namedWindow("Capture Display", WINDOW_AUTOSIZE);
 	namedWindow("Greyscale Display", WINDOW_AUTOSIZE);

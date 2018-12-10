@@ -57,7 +57,7 @@ int OutputHandler::WriteFile(string outputDir) {
 void OutputHandler::SaveImage(IplImage* frame) {
 	char filename[25];
 
-	sprintf(filename, "captures\\picture%d.png", imageCounter);
+	sprintf(filename, "picture%04d.png", imageCounter);
 	cvSaveImage(filename, frame);
 	imageCounter++;
 }

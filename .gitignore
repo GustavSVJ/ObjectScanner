@@ -331,3 +331,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/ObjectScanner/Test1
+/ObjectScanner/Test2
+/ObjectScanner/Test3
