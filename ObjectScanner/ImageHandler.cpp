@@ -32,6 +32,17 @@ IplImage * ImageHandler::MakeBinary(IplImage * input, int threshold) {
 }
 
 IplImage * ImageHandler::RemoveBackground(IplImage * input, IplImage * background) {
+	IplImage * output = cvCreateImage(cvSize(input->width, input->height), IPL_DEPTH_8U, 3);
+	
+	for (int i = 0; i < input->height; i++) {
+		for (int j = 0; j < input->width * 3; j++) {
+			int pixelValue = (unsigned char)input->imageData[j + i * (input->widthStep)] - (unsigned char)background->imageData[j + i * (input->widthStep)];
+			if (pixelValue < 0) pixelValue = 0;
+			output->imageData[j + i * (input->widthStep)] = pixelValue;
+		}
+	}
+
+	return output;
 }
 
 //int ImageHandler::FindObjects()

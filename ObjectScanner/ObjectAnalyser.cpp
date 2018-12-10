@@ -17,8 +17,9 @@ ObjectAnalyser::ObjectAnalyser()
 }
 
 ObjectAnalyser::ObjectAnalyser(int imageHeight, int imageWidth) {
-	TopLeft = cvPoint(imageHeight - 1, imageWidth - 1);
+	TopLeft = cvPoint(imageWidth - 1, imageHeight - 1);
 	BottomRight = cvPoint(0, 0);
+	
 	ImageWidth = imageWidth;
 	memset(histogramyaxis, 0, 256);
 	memset(histogramxaxis, 0, 1100);

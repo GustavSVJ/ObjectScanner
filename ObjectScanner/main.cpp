@@ -54,10 +54,15 @@ int main(int argc, char* argv[]) {
 	namedWindow("Histogram Display", WINDOW_AUTOSIZE);
 	namedWindow("Binary Display", WINDOW_AUTOSIZE);
 
-	for (int j = 0; j < fileCount; j++) {
+	IplImage *frameBackground = cvLoadImage(input.paths[0].c_str(), 1);
 
-		IplImage *frameColor = cvLoadImage(input.paths[j].c_str(), 1);
-		//IplImage *frameColor = input.WebcamCapture(0);
+
+	for (int j = 1; j < fileCount; j++) {
+
+		IplImage *frameInput = cvLoadImage(input.paths[j].c_str(), 1);
+
+
+		IplImage *frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground);
 
 		if (frameColor != NULL) {
 
@@ -77,7 +82,7 @@ int main(int argc, char* argv[]) {
 			IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
 			cvSet(objectMarkings, cvScalar(0));
 
-			ObjectAnalyser RoI[50];
+			ObjectAnalyser RoI[150];
 			int RoICounter = 1;
 
 			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {
@@ -85,7 +90,6 @@ int main(int argc, char* argv[]) {
 				unsigned char objectPixelValue = (unsigned char)objectMarkings->imageData[i];
 
 				if (pixelValue && objectPixelValue == 0 && checkPixel(frameBinary, objectMarkings, i)) {
-
 					RoI[(unsigned char)objectMarkings->imageData[i]].UpdateRoI(i);
 					frameBinary->imageData[i] = 150;
 				}
@@ -266,7 +270,7 @@ int main(int argc, char* argv[]) {
 
 			IplImage *highThresholdBinary = cvCreateImage(cvSize(frameGrey->width, frameGrey->height), IPL_DEPTH_8U, 1);
 
-			highThresholdBinary = ImageHandler::MakeBinary(frameGrey, 100);
+			highThresholdBinary = ImageHandler::MakeBinary(frameGrey, 75);
 
 
 			IplImage* img;
@@ -286,7 +290,7 @@ int main(int argc, char* argv[]) {
 			//Bearbejder fundne regions of interest
 			for (int i = 0; i < RoICounter; i++) {
 				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
-				cvRectangle(frameGrey, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
+				cvRectangle(frameColor, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
 
 				RoI[i].GetObjectImage(frameGrey, img);
 				CvPoint smallImageCenter = RoI[i].GetObjectCenter(img);
