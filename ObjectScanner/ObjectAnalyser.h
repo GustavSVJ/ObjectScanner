@@ -32,7 +32,9 @@ public:
 
 	int GetObjectWidth();
 
-	IplImage * GetObjectImage(IplImage * fullImage, IplImage * objectImage);
+	int CheckForNoise(IplImage * referenceBinary);
+
+	void GetObjectImage(IplImage * fullImage, IplImage * objectImage);
 
 	CvPoint GetObjectCenter(IplImage * input);
 

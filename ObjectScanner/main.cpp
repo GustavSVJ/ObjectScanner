@@ -2,6 +2,7 @@
 #include "OutputHandler.hpp"
 #include "DotMaker.hpp"
 #include "ObjectAnalyser.h"
+#include "ImageHandler.h"
 
 #include <stdio.h>
 #include <string>
@@ -41,6 +42,7 @@ int main(int argc, char* argv[]) {
 		//IplImage *frameColor = input.WebcamCapture(0);
 
 		if (frameColor != NULL) {
+
 			cvShowImage("Capture Display", frameColor);
 
 
@@ -49,57 +51,10 @@ int main(int argc, char* argv[]) {
 
 			cvShowImage("Greyscale Display", frameGrey);
 
-			unsigned int hist[256];
-			double max = 0;
-			unsigned char commonValue;
-
-			for (int i = 0; i < 256; i++) {
-				hist[i] = 0;
-			}
-
-			for (int i = 0; i < frameGrey->width*frameGrey->height; i++) {
-				unsigned char pixelValue = (unsigned char)frameGrey->imageData[i];
-
-				hist[pixelValue]++;
-
-				if (hist[pixelValue] > max) {
-					max = hist[pixelValue];
-					commonValue = pixelValue;
-				}
-			}
-
-
-
-			IplImage *histogram = cvCreateImage(cvSize(512, 512), 8, 3);
-
-			double scale = 512 / max;
-
-			for (int i = 0; i < 512; i += 2) {
-				cvLine(histogram, cvPoint(i, 512), cvPoint(i, 512 - (hist[i / 2] * scale)), cvScalar(40, 150, 0), 2);
-			}
-
-			cvShowImage("Histogram Display", histogram);
-			printf("Image: %s\n", input.paths[j].c_str());
-			printf("Most common value: %d\n\n", commonValue);
-
-			IplImage *frameBinary = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
-
-			cvCopy(frameGrey, frameBinary, 0);
-
-			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {
-				unsigned char pixelValue = (unsigned char)frameBinary->imageData[i];
-
-				if (pixelValue < 45) {
-					frameBinary->imageData[i] = 0;
-				}
-				else {
-					frameBinary->imageData[i] = 255;
-				}
-
-			}
+			IplImage *frameBinary = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);		
+			frameBinary = ImageHandler::MakeBinary(frameGrey, 15);
 
 			cvShowImage("Binary Display", frameBinary);
-
 
 			IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
 			cvSet(objectMarkings, cvScalar(0));
@@ -291,10 +246,27 @@ int main(int argc, char* argv[]) {
 
 			}
 
+			IplImage *highThresholdBinary = cvCreateImage(cvSize(frameGrey->width, frameGrey->height), IPL_DEPTH_8U, 1);
+
+			highThresholdBinary = ImageHandler::MakeBinary(frameGrey, 100);
+
 
 			IplImage* img;
-
+			int j = 0;
 			for (int i = 1; i < RoICounter; i++) {
+				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
+				RoI[i].GetObjectImage(frameGrey, img);
+				if (RoI[i].CheckForNoise(highThresholdBinary) == 0) {
+					RoI[j] = RoI[i];
+					j++;
+				}
+			}
+
+			RoICounter = j;
+
+			
+			//Bearbejder fundne regions of interest
+			for (int i = 0; i < RoICounter; i++) {
 				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
 				cvRectangle(frameGrey, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
 
@@ -305,11 +277,9 @@ int main(int argc, char* argv[]) {
 				cvLine(img, smallImageCenter, smallImageCenter, cvScalar(255), 1, 8);
 				cvLine(frameColor, bigImageCenter, bigImageCenter, CV_RGB(255,0,0), 1, 8);
 
-				printf("Done!");
-
 			}
-			printf("Done!");
 
+			printf("Done!");
 
 		}
 

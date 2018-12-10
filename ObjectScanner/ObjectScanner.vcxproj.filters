@@ -26,7 +26,7 @@
     <ClCompile Include="ObjectAnalyser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DotDetector.cpp">
+    <ClCompile Include="ImageHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,7 +43,7 @@
     <ClInclude Include="ObjectAnalyser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DotDetector.h">
+    <ClInclude Include="ImageHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

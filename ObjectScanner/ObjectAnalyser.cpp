@@ -48,7 +48,7 @@ int ObjectAnalyser::GetObjectWidth() {
 	return BottomRight.x - TopLeft.x - 1;
 }
 
-IplImage * ObjectAnalyser::GetObjectImage(IplImage * fullImage, IplImage * objectImage) {
+void ObjectAnalyser::GetObjectImage(IplImage * fullImage, IplImage * objectImage) {
 
 	int fullImageStartPixel = (TopLeft.x * TopLeft.y);
 	int fullImageEndPixel = ((BottomRight.x - TopLeft.x) * (BottomRight.y - TopLeft.y));
@@ -62,8 +62,26 @@ IplImage * ObjectAnalyser::GetObjectImage(IplImage * fullImage, IplImage * objec
 	}
 
 	ObjectImage = cvCloneImage(objectImage);
-	return objectImage;
 }
+
+int ObjectAnalyser::CheckForNoise(IplImage * referenceBinary) {
+	int fullImageStartPixel = (TopLeft.x * TopLeft.y);
+	int fullImageEndPixel = ((BottomRight.x - TopLeft.x) * (BottomRight.y - TopLeft.y));
+
+	for (int j = 0; j < ObjectImage->height; j++) {
+		int firstPixel = (TopLeft.y + 1 + j) * 1920 + (TopLeft.x + 1);
+
+		for (int i = 0; i < ObjectImage->width; i++) {
+			if (referenceBinary->imageData[i + firstPixel] != 0 && ObjectImage->imageData[i + j * (ObjectImage->widthStep)] != 0) {
+				return 0;
+			}
+		}
+	}
+
+	return 1;
+}
+
+
 
 CvPoint ObjectAnalyser::GetObjectCenter(IplImage * input) {
 
