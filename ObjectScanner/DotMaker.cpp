@@ -1,9 +1,11 @@
 #include "DotMaker.hpp"
 #include "highgui.h" 
+#include <opencv2/opencv.hpp>
 
 DotMaker::DotMaker()
 {
-	img = Mat::zeros(cvSize(1920, 1080), CV_8UC3);
+	img = cvCreateImage(cvSize(1920, 1080), 8, 3);
+	namedWindow("DotPlot", WINDOW_AUTOSIZE);
 }
 
 
@@ -11,25 +13,43 @@ DotMaker::~DotMaker()
 {
 }
 
-void DotMaker::AddLine(Point pt1, Point pt2, Scalar color, int thickness) {
-	
-	line(img, pt1, pt2, color, thickness, 8);
+void DotMaker::DisplayBlackImage() {
+
+	//IplImage *img = cvCreateImage(cvSize(1920, 1080), 8, 3);
+
+	cvZero(img);
+
+	cvShowImage("DotPlot", img);
+	cvWaitKey(500);
 }
 
-void DotMaker::AddDots(int x, int size, Scalar color, int distance) {
-	int height = img.rows;
+void DotMaker::DisplayDotImage(int offset) {
 
-	int i = 0;
+	int colorcount = 1;
+	int y = ymin + offset;
 
-	while (i < height) {
-		circle(img, Point(x,i), size, color, -1, 8, 0);
-		i += distance;
+	cvZero(img);
+
+	while (y <= (ymax)) {
+
+		if (colorcount == 1) {
+			cvCircle(img, cvPoint(x, y), 5, cvScalar(0, 255, 0), -1, 8, 0);
+			colorcount++;
+		}
+
+		else if (colorcount == 2) {
+			cvCircle(img, cvPoint(x, y), 5, cvScalar(255, 0, 0), -1, 8, 0);
+			colorcount = 1;
+		}
+
+		y += Distance;
 	}
-}
 
-void DotMaker::ShowImage() {
-	namedWindow("Dot Display", WINDOW_AUTOSIZE);
-	imshow("Dot Display", img);
+	cvCircle(img, cvPoint(x, ymin), 5, cvScalar(0, 0, 255), -1, 8, 0);
+	cvCircle(img, cvPoint(x, ymax), 5, cvScalar(0, 0, 255), -1, 8, 0);
+
+	cvShowImage("DotPlot", img);
+	cvWaitKey(500);
 }
 
 
