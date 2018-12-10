@@ -26,6 +26,9 @@
     <ClCompile Include="ObjectAnalyser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DotDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OutputHandler.hpp">
@@ -38,6 +41,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ObjectAnalyser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DotDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

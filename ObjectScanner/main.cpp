@@ -40,8 +40,6 @@ int main(int argc, char* argv[]) {
 		IplImage *frameColor = cvLoadImage(input.paths[j].c_str(), 1);
 		//IplImage *frameColor = input.WebcamCapture(0);
 
-
-
 		if (frameColor != NULL) {
 			cvShowImage("Capture Display", frameColor);
 
@@ -321,30 +319,6 @@ int main(int argc, char* argv[]) {
 	return 0;
 
 }
-
-
-
-/*
-int checkPixel(IplImage *image, int pixelToCheck, int *currentPixel, int firstToCheck, Direction *movingTowards, int *lookingAt) {
-	if (!(pixelToCheck < 0) && (unsigned char)image->imageData[pixelToCheck] == 1) {
-		*currentPixel = pixelToCheck;
-		*movingTowards = North;
-		//cvCircle(frameColor, cvPoint(*currentPixel / frameBinary->width, *currentPixel % frameBinary->width), 1, CV_RGB(0, 0, 255), 1, 8);
-		return 1;
-	}
-	else if (firstToCheck != NorthEast) {
-		*lookingAt = NorthEast;
-		return 0;
-	}
-	else {
-		*movingTowards = East;
-		*currentPixel++;
-		printf("Error!");
-		return 1;
-	}
-}
-
-*/
 
 
 int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck) {
