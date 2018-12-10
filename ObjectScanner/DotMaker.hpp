@@ -11,10 +11,11 @@ public:
 	DotMaker();
 	~DotMaker();
 
-	void AddDots(int x, int size, Scalar color, int distance);
-	void AddLine(Point pt1, Point pt2, Scalar color, int thickness);
-	void ShowImage();
+	int x = 960; int ymin = 100; int ymax = 1000; int Distance = 200;
 
-	Mat img;
+	void DisplayBlackImage();
+	void DisplayDotImage(int offset);
+
+	IplImage *img;
 };
 
