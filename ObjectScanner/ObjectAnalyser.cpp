@@ -65,13 +65,13 @@ IplImage * ObjectAnalyser::GetObjectImage(IplImage * fullImage, IplImage * objec
 	return objectImage;
 }
 
-CvPoint ObjectAnalyser::GetObjectCenter(IplImage * input) {
+void ObjectAnalyser::GetObjectCenter(IplImage * input, double * xValue, double *yValue) {
 
+	histox(input);
+	histoy(input);
 
-	histox();
-	histoy();
-
-	return cvPoint(xpos(), ypos());
+	*xValue = (xpos(input) / 2.0);
+	*yValue = (ypos(input) / 2.0);
 
 
 
@@ -110,29 +110,29 @@ CvPoint ObjectAnalyser::GetObjectCenter(IplImage * input) {
 }
 
 
-void ObjectAnalyser::histoy() {
-	for (int j = 0; j < ObjectImage->height; j++) {
-		for (int i = 0; i < ObjectImage->width; i++) {
-			unsigned char value = (unsigned char)ObjectImage->imageData[i + j * ObjectImage->widthStep];
+void ObjectAnalyser::histoy(IplImage* input) {
+	for (int j = 0; j < input->height; j++) {
+		for (int i = 0; i < input->width; i++) {
+			unsigned char value = (unsigned char)input->imageData[i + j * input->widthStep];
 			histogramyaxis[j] += value / 15;
 		}
 	}
 }
 
-void ObjectAnalyser::histox() {
-	for (int j = 0; j < ObjectImage->height; j++) {
-		for (int i = 0; i < ObjectImage->width; i++) {
-			unsigned char value = (unsigned char)ObjectImage->imageData[i + j * ObjectImage->widthStep];
-			histogramxaxis[i % ObjectImage->width] += value / 15;
+void ObjectAnalyser::histox(IplImage* input) {
+	for (int j = 0; j < input->height; j++) {
+		for (int i = 0; i < input->width; i++) {
+			unsigned char value = (unsigned char)input->imageData[i + j * input->widthStep];
+			histogramxaxis[i % input->width] += value / 15;
 		}
 	}
 }
 
 
-int ObjectAnalyser::xpos() {
-	int xplace = 0;
+double ObjectAnalyser::xpos(IplImage* input) {
+	double xplace = 0;
 	int maxx = 0;
-	for (int xscan = 0; xscan < ObjectImage->width; xscan++) {
+	for (int xscan = 0; xscan < input->width; xscan++) {
 		if (histogramxaxis[xscan] > maxx) {
 			maxx = histogramxaxis[xscan];
 			xplace = xscan;
@@ -141,10 +141,10 @@ int ObjectAnalyser::xpos() {
 	return xplace;
 }
 
-int ObjectAnalyser::ypos() {
-	int yplace = 0;
+double ObjectAnalyser::ypos(IplImage* input) {
+	double yplace = 0;
 	int maxy = 0;
-	for (int yscan = 0; yscan < ObjectImage->height; yscan++) {
+	for (int yscan = 0; yscan < input->height; yscan++) {
 		if (histogramyaxis[yscan] > maxy) {
 			maxy = histogramyaxis[yscan];
 			yplace = yscan;
@@ -170,7 +170,7 @@ IplImage* ObjectAnalyser::ScaleFilter(IplImage* Orginalimg) {
 	}
 	int TEMP1 = 0, TEMP2 = 0, TEMP3 = 0, TEMP4 = 0, TEMP5 = 0, TEMP6 = 0, TEMP7 = 0, TEMP8 = 0, TEMP9 = 0;
 	int tempA;
-	for (int x = 1; x < Scaledimage->widthStep - 1; x++)
+	for (int x = 1; x < Scaledimage->width-1; x++)
 	{
 		for (int y = 1; y < Scaledimage->height - 1; y++)
 		{

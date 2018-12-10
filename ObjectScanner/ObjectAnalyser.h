@@ -11,11 +11,11 @@ private:
 	int histogramyaxis[256];
 	int histogramxaxis[1100];
 
-	void histoy();
-	void histox();
+	void histoy(IplImage* input);
+	void histox(IplImage* input);
 
-	int xpos();
-	int ypos();
+	double xpos(IplImage* input);
+	double ypos(IplImage* input);
 
 public:
 
@@ -34,7 +34,7 @@ public:
 
 	IplImage * GetObjectImage(IplImage * fullImage, IplImage * objectImage);
 
-	CvPoint GetObjectCenter(IplImage * input);
+	void GetObjectCenter(IplImage * input, double * xValue, double *yValuet);
 
 	IplImage* ScaleFilter(IplImage* Orginalimg);
 
