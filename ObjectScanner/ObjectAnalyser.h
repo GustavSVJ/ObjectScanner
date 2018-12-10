@@ -36,5 +36,7 @@ public:
 
 	CvPoint GetObjectCenter(IplImage * input);
 
+	IplImage* ScaleFilter(IplImage* Orginalimg);
+
 };
 

@@ -152,3 +152,46 @@ int ObjectAnalyser::ypos() {
 	}
 	return yplace;
 }
+
+IplImage* ObjectAnalyser::ScaleFilter(IplImage* Orginalimg) {
+	IplImage *Scaledimage = cvCreateImage(cvSize(Orginalimg->width * 2, Orginalimg->height * 2), IPL_DEPTH_8U, 1);
+	IplImage *Gausimage = cvCreateImage(cvSize(Orginalimg->width * 2, Orginalimg->height * 2), IPL_DEPTH_8U, 1);
+	for (int j = 0; j < Orginalimg->height; j++) {
+		for (int i = 0; i < Orginalimg->width; i++) {
+			Scaledimage->imageData[i * 2 + j * 2 * Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Scaledimage->imageData[i * 2 + 1 + j * 2 * Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Scaledimage->imageData[i * 2 + j * 2 * Scaledimage->widthStep + Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Scaledimage->imageData[i * 2 + 1 + j * 2 * Scaledimage->widthStep + Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Gausimage->imageData[i * 2 + j * 2 * Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Gausimage->imageData[i * 2 + 1 + j * 2 * Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Gausimage->imageData[i * 2 + j * 2 * Scaledimage->widthStep + Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Gausimage->imageData[i * 2 + 1 + j * 2 * Scaledimage->widthStep + Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+		}
+	}
+	int TEMP1 = 0, TEMP2 = 0, TEMP3 = 0, TEMP4 = 0, TEMP5 = 0, TEMP6 = 0, TEMP7 = 0, TEMP8 = 0, TEMP9 = 0;
+	int tempA;
+	for (int x = 1; x < Scaledimage->widthStep - 1; x++)
+	{
+		for (int y = 1; y < Scaledimage->height - 1; y++)
+		{
+			TEMP1 = (unsigned char)Scaledimage->imageData[x - 1 + (y - 1) * Scaledimage->widthStep] * 1;
+			TEMP2 = (unsigned char)Scaledimage->imageData[x + (y - 1) * Scaledimage->widthStep] * 2;
+			TEMP3 = (unsigned char)Scaledimage->imageData[x + 1 + (y - 1) * Scaledimage->widthStep] * 1;
+
+			TEMP4 = (unsigned char)Scaledimage->imageData[x - 1 + y * Scaledimage->widthStep] * 2;
+			TEMP5 = (unsigned char)Scaledimage->imageData[x + y * Scaledimage->widthStep] * 4;
+			TEMP6 = (unsigned char)Scaledimage->imageData[x + 1 + y * Scaledimage->widthStep] * 2;
+
+			TEMP7 = (unsigned char)Scaledimage->imageData[x - 1 + (y + 1) * Scaledimage->widthStep] * 1;
+			TEMP8 = (unsigned char)Scaledimage->imageData[x + (y + 1) * Scaledimage->widthStep] * 2;
+			TEMP9 = (unsigned char)Scaledimage->imageData[x + 1 + (y + 1) * Scaledimage->widthStep] * 1;
+
+			tempA = ((TEMP1 + TEMP2 + TEMP3 + TEMP4 + TEMP5 + TEMP6 + TEMP7 + TEMP8 + TEMP9) / 16);
+			Gausimage->imageData[x + y * Scaledimage->widthStep] = tempA;
+
+
+		}
+	}
+
+	return Gausimage;
+}
