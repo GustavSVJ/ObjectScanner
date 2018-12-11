@@ -14,7 +14,7 @@
 
 
 #define HIGH_THRESHOLD 75
-#define LOW_THRESHOLD 15
+#define LOW_THRESHOLD 10
 
 using namespace cv;
 using namespace std;
@@ -32,11 +32,11 @@ int main(int argc, char* argv[]) {
 
 	int fileCount = input.FindFiles(argv[1]);
 
-	
+
 
 	OutputHandler fileSaver = OutputHandler();
 	DotMaker dotImage = DotMaker();
-	
+
 	/*
 
 	dotImage.DisplayBlackImage();
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 	dotImage.Distance = 50;
 
 	int i = 0;
-	
+
 	while(1){
 		dotImage.DisplayDotImage(10 * i);
 		i++;
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	return 0;
-	
+
 	*/
 
 	namedWindow("Capture Display", WINDOW_AUTOSIZE);
@@ -91,13 +91,24 @@ int main(int argc, char* argv[]) {
 
 			cvShowImage("Greyscale Display", frameGrey);
 
-			IplImage *frameBinary = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);		
+			IplImage *frameBinary = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 			frameBinary = ImageHandler::MakeBinary(frameGrey, 15);
 
 			cvShowImage("Binary Display", frameBinary);
 
 			IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
 			cvSet(objectMarkings, cvScalar(0));
+
+			IplImage *strongColors = ImageHandler::Colorize(frameColor, HIGH_THRESHOLD);
+
+			IplImage *strongGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
+			cvCvtColor(strongColors, strongGrey, COLOR_RGB2GRAY);
+
+			IplImage *highThresholdBinary = cvCreateImage(cvSize(strongGrey->width, strongGrey->height), IPL_DEPTH_8U, 1);
+
+			highThresholdBinary = ImageHandler::MakeBinary(strongGrey, 10);
+
+
 
 			ObjectAnalyser RoI[100];
 			int RoICounter = 1;
@@ -107,8 +118,8 @@ int main(int argc, char* argv[]) {
 				unsigned char objectPixelValue = (unsigned char)objectMarkings->imageData[i];
 
 				if (pixelValue && objectPixelValue == 0 && checkPixel(frameBinary, objectMarkings, i)) {
-					RoI[(unsigned char)objectMarkings->imageData[i]].UpdateRoI(i);
-					frameBinary->imageData[i] = 150;
+					//RoI[(unsigned char)objectMarkings->imageData[i]].UpdateRoI(i);
+					
 				}
 
 				else if (pixelValue && objectPixelValue == 0) {
@@ -122,7 +133,8 @@ int main(int argc, char* argv[]) {
 
 					while (startPixel != pixelToCheck) {
 						objectMarkings->imageData[currentPixel] = RoICounter;
-						RoI[(unsigned char)objectMarkings->imageData[currentPixel]].UpdateRoI(i);
+						RoI[(unsigned char)objectMarkings->imageData[currentPixel]].UpdateRoI(currentPixel);
+						frameBinary->imageData[currentPixel] = 150;
 						int firstToCheck = movingTowards - 2;
 						if (firstToCheck < 0) {
 							firstToCheck += 8;
@@ -279,20 +291,23 @@ int main(int argc, char* argv[]) {
 						moveOn = 0;
 					}
 
-					RoICounter++;
+					IplImage* img;
+					img = cvCreateImage(cvSize(RoI[RoICounter].GetObjectWidth(), RoI[RoICounter].GetObjectHeight()), IPL_DEPTH_8U, 1);
+					RoI[RoICounter].GetObjectImage(frameGrey, img);
+					cvRectangle(frameColor, RoI[RoICounter].TopLeft, RoI[RoICounter].BottomRight, CV_RGB(0, 255, 255), 1, 8);
+
+					if (RoI[RoICounter].CheckForNoise(highThresholdBinary) == 0) {
+						RoICounter++;
+					}
+					else {
+						cvRectangle(frameColor, RoI[RoICounter].TopLeft, RoI[RoICounter].BottomRight, CV_RGB(255, 255, 0), 1, 8);
+						RoI[RoICounter] = ObjectAnalyser(frameBinary->height, frameBinary->width);
+					}
 
 				}
 
 			}
 
-			IplImage *strongColors = ImageHandler::Colorize(frameColor, HIGH_THRESHOLD);
-
-			IplImage *strongGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
-			cvCvtColor(strongColors, strongGrey, COLOR_RGB2GRAY);
-
-			IplImage *highThresholdBinary = cvCreateImage(cvSize(strongGrey->width, strongGrey->height), IPL_DEPTH_8U, 1);
-
-			highThresholdBinary = ImageHandler::MakeBinary(strongGrey, 10);
 
 			ObjectAnalyser redRoI[25];
 			int redRoICounter = 0;
