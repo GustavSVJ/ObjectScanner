@@ -219,8 +219,9 @@ void ObjectAnalyser::FindXY(ObjectAnalyser input[], int PointCounter, IplImage *
 
 }
 
-void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[], double Y_color[], double xRed[], double xBlue[], double xGreen[], double X_color[]) {
+void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[], double Y_color[], double xRed[], double xBlue[], double xGreen[], double X_color[], int picturecounter) {
 
+	
 	int R = 0, G = 0, B = 0;
 	int c = 0;
 	int i = 0;
@@ -228,18 +229,25 @@ void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[]
 		while (Done) {
 			switch (c)
 			{
-			case 0: // RØD
-				if (R > 1) {
+			case 0: // Grøn
+				if (G > 1) {
 
 					Done = 0;
 					break;
 				}
 				else {
-					Y_color[i] = yRed[R];
-					X_color[i] = xRed[R];
-					R++;
+					Y_color[i] = yGreen[G];
+					X_color[i] = xGreen[G];
+					G++;
 					i++;
-					c = 1;
+
+					if (picturecounter == 0) {
+						c = 1;
+					}
+					else {
+						c = 2;
+					}
+
 						break;
 				}
 
@@ -251,23 +259,32 @@ void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[]
 					B++;
 					i++;
 					c = 2;
-						break;
+					break;
 				}
 				else
-					c = 0;
+					if (yRed[R] > 0) {
+						c = 2;
+					}
+					else
+						c = 0;
 				break;
 
-					case 2: // GRØN
-						if (yGreen[G] > 0) {
-							Y_color[i] = yGreen[G];
-							X_color[i] = xGreen[G];
-							G++;
+					case 2: // Rød
+						if (yRed[R] > 0) {
+							Y_color[i] = yRed[R];
+							X_color[i] = xRed[R];
+							R++;
 							i++;
 							c = 1;
 								break;
 						}
 						else {
-							c = 0;
+							if (yBlue[B] > 0) {
+								c = 1;
+							}
+							else {
+								c = 0;
+							}
 								break;
 						}
 			}

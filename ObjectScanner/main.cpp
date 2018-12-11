@@ -293,11 +293,23 @@ int main(int argc, char* argv[]) {
 			}
 
 			// Her må vi starte med at rette
-			double Xstor[25] = { 0.0 };
-			double Ystor[25] = { 0.0 };
+			double Xred[25] = { 0.0 };
+			double Yred[25] = { 0.0 };
 
 			// Her finder vi den absolutte X,Y position for prikken i billedet
-			ObjectAnalyser::FindXY(RoI, RoICounter,frameGrey, Xstor, Ystor);
+			ObjectAnalyser::FindXY(RoI, RoICounter,frameGrey, Xred, Yred);
+
+			double Xblue[25] = { 0.0 };
+			double Yblue[25] = { 0.0 };
+
+			// Her finder vi den absolutte X,Y position for prikken i billedet
+			ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xblue, Yblue);
+
+			double Xgreen[10] = { 0.0 };
+			double Ygreen[10] = { 0.0 };
+
+			// Her finder vi den absolutte X,Y position for prikken i billedet
+			ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xgreen, Ygreen);
 
 			// Test arrays til test af sorteringsfunktionen
 			double R1[2] = { 1,14 };
@@ -310,7 +322,7 @@ int main(int argc, char* argv[]) {
 			double Y2[25] = { 0 };
 
 			// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
-			ObjectAnalyser::SortingArray(R1, B1, G1, Y1, R2, B2, G2, Y2);
+			ObjectAnalyser::SortingArray(R1, B1, G1, Y1, R2, B2, G2, Y2, 0);
 
 			// Udskrivning af test af sorteringsfunktion
 			for (int i = 0; i < 26; i++) {
