@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 
 				if (pixelValue && objectPixelValue == 0 && checkPixel(frameBinary, objectMarkings, i)) {
 					//RoI[(unsigned char)objectMarkings->imageData[i]].UpdateRoI(i);
-					
+
 				}
 
 				else if (pixelValue && objectPixelValue == 0) {
@@ -318,9 +318,7 @@ int main(int argc, char* argv[]) {
 
 			ObjectAnalyser blueRoI[25];
 			int blueRoICounter = 0;
-			// Her må vi starte med at rette
-			double Xred[25] = { 0.0 };
-			double Yred[25] = { 0.0 };
+
 
 			IplImage* img;
 			for (int i = 1; i < RoICounter; i++) {
@@ -330,8 +328,6 @@ int main(int argc, char* argv[]) {
 				if (RoI[i].CheckForNoise(highThresholdBinary) == 0) {
 
 					dotColor color = RoI[i].CheckDotColor(strongColors);
-			// Her finder vi den absolutte X,Y position for prikken i billedet
-			ObjectAnalyser::FindXY(RoI, RoICounter,frameGrey, Xred, Yred);
 
 					if (color == COLOR_RED) {
 						redRoI[redRoICounter] = RoI[i];
@@ -353,67 +349,66 @@ int main(int argc, char* argv[]) {
 					}
 				}
 			}
-			/*
+
+			// Her må vi starte med at rette
+			double Xred[25] = { 0.0 };
+			double Yred[25] = { 0.0 };
+			// Her finder vi den absolutte X,Y position for prikken i billedet
+			ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xred, Yred);
+
+
 			//Bearbejder fundne regions of interest
 			for (int i = 0; i < RoICounter; i++) {
 				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
 				cvRectangle(frameColor, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
-			double Xblue[25] = { 0.0 };
-			double Yblue[25] = { 0.0 };
+				double Xblue[25] = { 0.0 };
+				double Yblue[25] = { 0.0 };
 
-			// Her finder vi den absolutte X,Y position for prikken i billedet
-			ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xblue, Yblue);
+				// Her finder vi den absolutte X,Y position for prikken i billedet
+				ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xblue, Yblue);
 
-			double Xgreen[10] = { 0.0 };
-			double Ygreen[10] = { 0.0 };
+				double Xgreen[10] = { 0.0 };
+				double Ygreen[10] = { 0.0 };
 
-			// Her finder vi den absolutte X,Y position for prikken i billedet
-			ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xgreen, Ygreen);
+				// Her finder vi den absolutte X,Y position for prikken i billedet
+				ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xgreen, Ygreen);
 
-			// Test arrays til test af sorteringsfunktionen
-			double R1[2] = { 1,14 };
-			double B1[10] = { 2,4,6,8,10,12,14,0,0,0 };
-			double G1[10] = { 3,5,7,9,11,13,0,0,0,0 };
-			double Y1[25] = { 0 };
-			double R2[2] = { 1,14 };
-			double B2[10] = { 15,14,13,12,11,10,9,0,0,0 };
-			double G2[10] = { 3,5,7,9,11,13,0,0,0,0 };
-			double Y2[25] = { 0 };
+				// Test arrays til test af sorteringsfunktionen
+				double R1[2] = { 1,14 };
+				double B1[10] = { 2,4,6,8,10,12,14,0,0,0 };
+				double G1[10] = { 3,5,7,9,11,13,0,0,0,0 };
+				double Y1[25] = { 0 };
+				double R2[2] = { 1,14 };
+				double B2[10] = { 15,14,13,12,11,10,9,0,0,0 };
+				double G2[10] = { 3,5,7,9,11,13,0,0,0,0 };
+				double Y2[25] = { 0 };
 
-			// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
-			ObjectAnalyser::SortingArray(R1, B1, G1, Y1, R2, B2, G2, Y2, 0);
+				// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
+				ObjectAnalyser::SortingArray(R1, B1, G1, Y1, R2, B2, G2, Y2, 0);
 
-			// Udskrivning af test af sorteringsfunktion
-			for (int i = 0; i < 26; i++) {
-				printf("y %lf\n", Y1[i]);
-				printf("x %lf\n", Y2[i]);
+				// Udskrivning af test af sorteringsfunktion
+				for (int i = 0; i < 26; i++) {
+					printf("y %lf\n", Y1[i]);
+					printf("x %lf\n", Y2[i]);
+				}
+
+				// Test af højde bestemmelses funktionen
+				ObjectAnalyser hej;
+
+				hej.init_Height(0.54, 0.24, 0.00517, 0.000002677);
+				hej.Reference_Calc(962);
+				double Height = hej.CalcObjectHeight(999);
+
+				printf("Height = %lf \n", Height);
+				printf("hej");
+
 			}
 
-			// Test af højde bestemmelses funktionen
-			ObjectAnalyser hej;
-
-			hej.init_Height(0.54, 0.24, 0.00517, 0.000002677);
-			hej.Reference_Calc(962);
-			double Height = hej.CalcObjectHeight(999);
-
-			printf("Height = %lf \n", Height);
-			printf("hej");
-			
-
-			
-
-
-
-
-
-
+			//waitKey(0);
 		}
 
-		//waitKey(0);
+		return 0;
 	}
-
-	return 0;
-
 }
 
 
