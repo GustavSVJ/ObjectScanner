@@ -109,15 +109,13 @@ dotColor ObjectAnalyser::CheckDotColor(IplImage * strongColor) {
 	return ERROR;
 }
 
+void ObjectAnalyser::GetObjectCenter(IplImage * input, double * xValue, double *yValue) {
 
+	histox(input);
+	histoy(input);
 
-CvPoint ObjectAnalyser::GetObjectCenter(IplImage * input) {
-
-
-	histox();
-	histoy();
-
-	return cvPoint(xpos(), ypos());
+	*xValue = (xpos(input) / 2.0);
+	*yValue = (ypos(input) / 2.0);
 
 
 
@@ -156,29 +154,29 @@ CvPoint ObjectAnalyser::GetObjectCenter(IplImage * input) {
 }
 
 
-void ObjectAnalyser::histoy() {
-	for (int j = 0; j < ObjectImage->height; j++) {
-		for (int i = 0; i < ObjectImage->width; i++) {
-			unsigned char value = (unsigned char)ObjectImage->imageData[i + j * ObjectImage->widthStep];
+void ObjectAnalyser::histoy(IplImage* input) {
+	for (int j = 0; j < input->height; j++) {
+		for (int i = 0; i < input->width; i++) {
+			unsigned char value = (unsigned char)input->imageData[i + j * input->widthStep];
 			histogramyaxis[j] += value / 15;
 		}
 	}
 }
 
-void ObjectAnalyser::histox() {
-	for (int j = 0; j < ObjectImage->height; j++) {
-		for (int i = 0; i < ObjectImage->width; i++) {
-			unsigned char value = (unsigned char)ObjectImage->imageData[i + j * ObjectImage->widthStep];
-			histogramxaxis[i % ObjectImage->width] += value / 15;
+void ObjectAnalyser::histox(IplImage* input) {
+	for (int j = 0; j < input->height; j++) {
+		for (int i = 0; i < input->width; i++) {
+			unsigned char value = (unsigned char)input->imageData[i + j * input->widthStep];
+			histogramxaxis[i % input->width] += value / 15;
 		}
 	}
 }
 
 
-int ObjectAnalyser::xpos() {
-	int xplace = 0;
+double ObjectAnalyser::xpos(IplImage* input) {
+	double xplace = 0;
 	int maxx = 0;
-	for (int xscan = 0; xscan < ObjectImage->width; xscan++) {
+	for (int xscan = 0; xscan < input->width; xscan++) {
 		if (histogramxaxis[xscan] > maxx) {
 			maxx = histogramxaxis[xscan];
 			xplace = xscan;
@@ -187,10 +185,10 @@ int ObjectAnalyser::xpos() {
 	return xplace;
 }
 
-int ObjectAnalyser::ypos() {
-	int yplace = 0;
+double ObjectAnalyser::ypos(IplImage* input) {
+	double yplace = 0;
 	int maxy = 0;
-	for (int yscan = 0; yscan < ObjectImage->height; yscan++) {
+	for (int yscan = 0; yscan < input->height; yscan++) {
 		if (histogramyaxis[yscan] > maxy) {
 			maxy = histogramyaxis[yscan];
 			yplace = yscan;
@@ -198,3 +196,172 @@ int ObjectAnalyser::ypos() {
 	}
 	return yplace;
 }
+
+IplImage* ObjectAnalyser::ScaleFilter(IplImage* Orginalimg) {
+	IplImage *Scaledimage = cvCreateImage(cvSize(Orginalimg->width * 2, Orginalimg->height * 2), IPL_DEPTH_8U, 1);
+	IplImage *Gausimage = cvCreateImage(cvSize(Orginalimg->width * 2, Orginalimg->height * 2), IPL_DEPTH_8U, 1);
+	for (int j = 0; j < Orginalimg->height; j++) {
+		for (int i = 0; i < Orginalimg->width; i++) {
+			Scaledimage->imageData[i * 2 + j * 2 * Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Scaledimage->imageData[i * 2 + 1 + j * 2 * Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Scaledimage->imageData[i * 2 + j * 2 * Scaledimage->widthStep + Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Scaledimage->imageData[i * 2 + 1 + j * 2 * Scaledimage->widthStep + Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Gausimage->imageData[i * 2 + j * 2 * Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Gausimage->imageData[i * 2 + 1 + j * 2 * Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Gausimage->imageData[i * 2 + j * 2 * Scaledimage->widthStep + Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+			Gausimage->imageData[i * 2 + 1 + j * 2 * Scaledimage->widthStep + Scaledimage->widthStep] = Orginalimg->imageData[i + j * Orginalimg->widthStep];
+		}
+	}
+	int TEMP1 = 0, TEMP2 = 0, TEMP3 = 0, TEMP4 = 0, TEMP5 = 0, TEMP6 = 0, TEMP7 = 0, TEMP8 = 0, TEMP9 = 0;
+	int tempA;
+	for (int x = 1; x < Scaledimage->width - 1; x++)
+	{
+		for (int y = 1; y < Scaledimage->height - 1; y++)
+		{
+			TEMP1 = (unsigned char)Scaledimage->imageData[x - 1 + (y - 1) * Scaledimage->widthStep] * 1;
+			TEMP2 = (unsigned char)Scaledimage->imageData[x + (y - 1) * Scaledimage->widthStep] * 2;
+			TEMP3 = (unsigned char)Scaledimage->imageData[x + 1 + (y - 1) * Scaledimage->widthStep] * 1;
+
+			TEMP4 = (unsigned char)Scaledimage->imageData[x - 1 + y * Scaledimage->widthStep] * 2;
+			TEMP5 = (unsigned char)Scaledimage->imageData[x + y * Scaledimage->widthStep] * 4;
+			TEMP6 = (unsigned char)Scaledimage->imageData[x + 1 + y * Scaledimage->widthStep] * 2;
+
+			TEMP7 = (unsigned char)Scaledimage->imageData[x - 1 + (y + 1) * Scaledimage->widthStep] * 1;
+			TEMP8 = (unsigned char)Scaledimage->imageData[x + (y + 1) * Scaledimage->widthStep] * 2;
+			TEMP9 = (unsigned char)Scaledimage->imageData[x + 1 + (y + 1) * Scaledimage->widthStep] * 1;
+
+			tempA = ((TEMP1 + TEMP2 + TEMP3 + TEMP4 + TEMP5 + TEMP6 + TEMP7 + TEMP8 + TEMP9) / 16);
+			Gausimage->imageData[x + y * Scaledimage->widthStep] = tempA;
+
+
+		}
+	}
+
+	return Gausimage;
+}
+
+void ObjectAnalyser::FindXY(ObjectAnalyser input[], int PointCounter, IplImage *frame, double Xstor[], double Ystor[]) {
+
+	IplImage* img;
+
+	for (int i = 1; i < PointCounter; i++) {
+		double xValue = 0.0;
+		double yValue = 0.0;
+		img = cvCreateImage(cvSize(input[i].GetObjectWidth(), input[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
+		cvRectangle(frame, input[i].TopLeft, input[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
+		input[i].GetObjectImage(frame, img);
+		IplImage *Temp = input[i].ScaleFilter(img);
+		input[i].GetObjectCenter(Temp, &xValue, &yValue);
+		CvPoint smallImageCenter = cvPoint(xValue + 0.5, yValue + 0.5);
+		CvPoint bigImageCenter = cvPoint(smallImageCenter.x + 1 + input[i].TopLeft.x, smallImageCenter.y + 1 + input[i].TopLeft.y);
+		Xstor[i] = xValue + 1 + input[i].TopLeft.x;
+		Ystor[i] = yValue + 1 + input[i].TopLeft.y;
+		cvLine(img, smallImageCenter, smallImageCenter, cvScalar(255), 1, 8);
+		cvLine(frame, bigImageCenter, bigImageCenter, CV_RGB(255, 0, 0), 1, 8);
+		printf("Done!");
+	}
+
+}
+
+void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[], double Y_color[], double xRed[], double xBlue[], double xGreen[], double X_color[], int picturecounter) {
+
+	
+	int R = 0, G = 0, B = 0;
+	int c = 0;
+	int i = 0;
+	char Done = 1;
+		while (Done) {
+			switch (c)
+			{
+			case 0: // Grøn
+				if (G > 1) {
+
+					Done = 0;
+					break;
+				}
+				else {
+					Y_color[i] = yGreen[G];
+					X_color[i] = xGreen[G];
+					G++;
+					i++;
+
+					if (picturecounter == 0) {
+						c = 1;
+					}
+					else {
+						c = 2;
+					}
+
+						break;
+				}
+
+
+			case 1: // BLÅ
+				if (yBlue[B] > 0) {
+					Y_color[i] = yBlue[B];
+					X_color[i] = xBlue[B];
+					B++;
+					i++;
+					c = 2;
+					break;
+				}
+				else
+					if (yRed[R] > 0) {
+						c = 2;
+					}
+					else
+						c = 0;
+				break;
+
+					case 2: // Rød
+						if (yRed[R] > 0) {
+							Y_color[i] = yRed[R];
+							X_color[i] = xRed[R];
+							R++;
+							i++;
+							c = 1;
+								break;
+						}
+						else {
+							if (yBlue[B] > 0) {
+								c = 1;
+							}
+							else {
+								c = 0;
+							}
+								break;
+						}
+			}
+		}
+}
+
+
+
+
+
+void ObjectAnalyser::init_Height(double lightToObject, double baseLine, double focalLength, double aftandPrPixel) {
+		LightToObject = lightToObject;
+		Baseline = baseLine;
+		FocalLength = focalLength *0.887;
+		AfstandPrPixel = aftandPrPixel;
+	}
+
+void ObjectAnalyser::Reference_Calc(int x) {
+
+		double laengde = ((x - Mid)*AfstandPrPixel);
+
+		double vinkel_scene = atan(LightToObject / Baseline);
+		double vinkel_i = atan(laengde / FocalLength);
+
+		double temp = vinkel_scene + vinkel_i;
+		K = tan(temp);
+		C = Baseline * tan(vinkel_scene);
+
+	}
+
+double ObjectAnalyser::CalcObjectHeight(int y) {
+
+		double x = (y - Mid) * AfstandPrPixel; 
+		return (fabs((Baseline * (K - (x / FocalLength)) / (1 + K * (x / FocalLength))) - C));
+
+	}
