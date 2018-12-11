@@ -315,7 +315,17 @@ int main(int argc, char* argv[]) {
 				printf("x %lf\n", Y2[i]);
 			}
 
+			ObjectAnalyser hej;
 
+			hej.init_Height(0.54, 0.24, 0.00517, 0.000002677);
+			hej.Reference_Calc(962);
+			double Height = hej.CalcObjectHeight(999);
+
+			printf("Height = %lf \n", Height);
+			printf("hej");
+			
+
+			
 
 
 
