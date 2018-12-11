@@ -43,7 +43,7 @@ int InputHandler::CheckIfDirExists(const fs::path& p)
 
 int InputHandler::CheckArguments(int argc, char* argv[]) {
 	
-	if (argc == 2) {
+	if (argc == 3) {
 		string argString = argv[1];
 		if (argString == "camera") {
 			printf("Using camera as input!");

@@ -2,10 +2,13 @@
 #include "highgui.h" 
 #include <opencv2/opencv.hpp>
 
+using namespace cv;
+
 DotMaker::DotMaker()
 {
 	img = cvCreateImage(cvSize(1920, 1080), 8, 3);
-	namedWindow("DotPlot", WINDOW_AUTOSIZE);
+	namedWindow("DotPlot", WINDOW_NORMAL);
+	setWindowProperty("DotPlot", WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
 }
 
 
@@ -20,6 +23,7 @@ void DotMaker::DisplayBlackImage() {
 	cvZero(img);
 
 	cvShowImage("DotPlot", img);
+
 	cvWaitKey(500);
 }
 

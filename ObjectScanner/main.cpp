@@ -34,74 +34,40 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	int fileCount = input.FindFiles(argv[1]);
-
-
-
 	OutputHandler fileSaver = OutputHandler();
 	DotMaker dotImage = DotMaker();
 
-	/*
-
-	dotImage.DisplayBlackImage();
-	cvWaitKey(0);
-	IplImage *frameBackground = input.WebcamCapture(1);
-	frameBackground = input.WebcamCapture(1);
-	fileSaver.SaveImage(frameBackground);
-
-	dotImage.Distance = 50;
-
-	int i = 0;
-
-	while(1){
-		dotImage.DisplayDotImage(10 * i);
-		i++;
-		IplImage *frameInput = input.WebcamCapture(1);
-		fileSaver.SaveImage(frameInput);
-
-
-
-
-		printf("done!");
-
-	}
-
-	return 0;
-
-	*/
-
-	namedWindow("Capture Display", WINDOW_AUTOSIZE);
-	namedWindow("Greyscale Display", WINDOW_AUTOSIZE);
-	namedWindow("Histogram Display", WINDOW_AUTOSIZE);
-	namedWindow("Binary Display", WINDOW_AUTOSIZE);
-
-	IplImage *frameBackground = cvLoadImage(input.paths[0].c_str(), 1);
-
 	for (int moveX = 0;; moveX++) {
 
+		dotImage.DisplayBlackImage();
+
+		if (moveX == 0) {
+			cvWaitKey(0);
+		}
+
+		IplImage *frameBackground = input.WebcamCapture(1);
+		fileSaver.SaveImage(frameBackground);
 
 
-		for (int moveY = 0; moveY < fileCount - 1; moveY++) {
+		for (int moveY = 0; moveY < 5; moveY++) {
 
-			IplImage *frameInput = cvLoadImage(input.paths[moveY + 1].c_str(), 1);
+			dotImage.Distance = 50;
+
+			dotImage.DisplayDotImage(10 * moveY);
+			IplImage *frameInput = input.WebcamCapture(1);
+			fileSaver.SaveImage(frameInput);
 
 			IplImage *frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground);
 
 
 			if (frameColor != NULL) {
 
-				cvShowImage("Capture Display", frameColor);
-
-
 				IplImage *frameGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 				cvCvtColor(frameColor, frameGrey, COLOR_RGB2GRAY);
 
-				cvShowImage("Greyscale Display", frameGrey);
 
 				IplImage *frameBinary = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 				frameBinary = ImageHandler::MakeBinary(frameGrey, 15);
-
-				cvShowImage("Binary Display", frameBinary);
 
 				IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
 				cvSet(objectMarkings, cvScalar(0));
@@ -382,7 +348,7 @@ int main(int argc, char* argv[]) {
 				ObjectAnalyser::SortingArray(Yred, Yblue, Ygreen, Ysort, Xred, Xblue, Xgreen, Xsort, 0);
 
 				// Udskrivning af test af sorteringsfunktion
-	
+
 
 				// Test af højde bestemmelses funktionen
 				ObjectAnalyser hej;
@@ -395,16 +361,16 @@ int main(int argc, char* argv[]) {
 				}
 				if (moveX % 5 == 0) {
 					X_distance++;
-					}
+				}
 				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
 					Xsort[i] = X_distance;
 					if (i == 0)
-							Ysort[i] = 0;
+						Ysort[i] = 0;
 					else if (i == (greenRoICounter + redRoICounter + blueRoICounter - 1))
-							Ysort[i] = BottomGreen;
+						Ysort[i] = BottomGreen;
 					else
-							Ysort[i] = Y_distanceprpoint * i + (offset* (moveX % 5));
-		
+						Ysort[i] = Y_distanceprpoint * i + (offset* (moveX % 5));
+
 					Zsort[i] = Zsort[i] * 100;
 				}
 
@@ -422,11 +388,13 @@ int main(int argc, char* argv[]) {
 			}
 
 		}
-		fileSaver.WriteFile(argv[2]);
-			waitKey(0);
-			return(0);
+
+		if (waitKey(0) == 'c') {
+			fileSaver.WriteFile(argv[2]);
+			return 0;
+		}
+
 	}
-	return 0;
 }
 
 
