@@ -17,6 +17,7 @@ enum Direction { North, NorthEast, East, SouthEast, South, SouthWest, West, Nort
 int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck);
 
 
+
 int main(int argc, char* argv[]) {
 
 	InputHandler input = InputHandler();
@@ -291,27 +292,16 @@ int main(int argc, char* argv[]) {
 
 			}
 
+			// Her må vi starte med at rette
+			double Xstor[25] = { 0.0 };
+			double Ystor[25] = { 0.0 };
 
-			IplImage* img;
-			double xValue = 0.0;
-			double yValue = 0.0;
-			for (int i = 1; i < RoICounter; i++) {
-				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
-				cvRectangle(frameGrey, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
-				RoI[i].GetObjectImage(frameGrey, img);
-				IplImage *Temp = RoI[i].ScaleFilter(img);
-				RoI[i].GetObjectCenter(Temp, &xValue, &yValue);
-				CvPoint smallImageCenter = cvPoint(xValue + 0.5, yValue + 0.5);
-				CvPoint bigImageCenter = cvPoint(smallImageCenter.x + 1 + RoI[i].TopLeft.x, smallImageCenter.y + 1 + RoI[i].TopLeft.y);
-				double Xstor = xValue + 1 + RoI[i].TopLeft.x;
-				double Ystor = yValue + 1 + RoI[i].TopLeft.y;
-				cvLine(img, smallImageCenter, smallImageCenter, cvScalar(255), 1, 8);
-				cvLine(frameColor, bigImageCenter, bigImageCenter, CV_RGB(255,0,0), 1, 8);
+			ObjectAnalyser::FindXY(RoI, RoICounter,frameGrey, Xstor, Ystor);
 
-				printf("Done!");
 
-			}
-			printf("Done!");
+
+
+
 
 
 		}

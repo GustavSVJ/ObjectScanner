@@ -195,3 +195,29 @@ IplImage* ObjectAnalyser::ScaleFilter(IplImage* Orginalimg) {
 
 	return Gausimage;
 }
+
+void ObjectAnalyser::FindXY(ObjectAnalyser input[], int PointCounter, IplImage *frame, double Xstor[], double Ystor[]) {
+
+	IplImage* img;
+
+	for (int i = 1; i < PointCounter; i++) {
+		double xValue = 0.0;
+		double yValue = 0.0;
+		img = cvCreateImage(cvSize(input[i].GetObjectWidth(), input[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
+		cvRectangle(frame, input[i].TopLeft, input[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
+		input[i].GetObjectImage(frame, img);
+		IplImage *Temp = input[i].ScaleFilter(img);
+		input[i].GetObjectCenter(Temp, &xValue, &yValue);
+		CvPoint smallImageCenter = cvPoint(xValue + 0.5, yValue + 0.5);
+		CvPoint bigImageCenter = cvPoint(smallImageCenter.x + 1 + input[i].TopLeft.x, smallImageCenter.y + 1 + input[i].TopLeft.y);
+		Xstor[i] = xValue + 1 + input[i].TopLeft.x;
+		Ystor[i] = yValue + 1 + input[i].TopLeft.y;
+		cvLine(img, smallImageCenter, smallImageCenter, cvScalar(255), 1, 8);
+		cvLine(frame, bigImageCenter, bigImageCenter, CV_RGB(255, 0, 0), 1, 8);
+		printf("Done!");
+	}
+
+}
+
+
+

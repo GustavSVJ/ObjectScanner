@@ -38,5 +38,6 @@ public:
 
 	IplImage* ScaleFilter(IplImage* Orginalimg);
 
-};
+	static void FindXY(ObjectAnalyser input[], int PointCounter, IplImage *frame, double Xstor[], double Ystor[]);
 
+};
