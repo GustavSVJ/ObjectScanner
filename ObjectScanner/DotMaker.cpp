@@ -33,20 +33,21 @@ void DotMaker::DisplayDotImage(int offset) {
 	while (y <= (ymax)) {
 
 		if (colorcount == 1) {
-			cvCircle(img, cvPoint(x, y), 5, cvScalar(0, 255, 0), -1, 8, 0);
+			cvCircle(img, cvPoint(x, y), 5, CV_RGB(255, 0, 0), -1, 8, 0);
 			colorcount++;
 		}
 
 		else if (colorcount == 2) {
-			cvCircle(img, cvPoint(x, y), 5, cvScalar(255, 0, 0), -1, 8, 0);
+			
+			cvCircle(img, cvPoint(x, y), 5, CV_RGB(0, 0, 255), -1, 8, 0);
 			colorcount = 1;
 		}
 
 		y += Distance;
 	}
 
-	cvCircle(img, cvPoint(x, ymin), 5, cvScalar(0, 0, 255), -1, 8, 0);
-	cvCircle(img, cvPoint(x, ymax), 5, cvScalar(0, 0, 255), -1, 8, 0);
+	cvCircle(img, cvPoint(x, ymin), 5, cvScalar(0, 255, 0), -1, 8, 0);
+	cvCircle(img, cvPoint(x, ymax), 5, cvScalar(0, 255, 0), -1, 8, 0);
 
 	cvShowImage("DotPlot", img);
 	cvWaitKey(500);

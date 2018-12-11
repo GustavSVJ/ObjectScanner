@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>"C:\Users\s164846\OneDrive - Danmarks Tekniske Universitet\Eksamensrapport\ColorTest\Test1" "C:\Users\s164846\Desktop"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>"C:\Users\s164846\OneDrive - Danmarks Tekniske Universitet\Eksamensrapport\ColorTest\Test5" "C:\Users\s164846\Desktop"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

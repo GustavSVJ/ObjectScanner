@@ -11,6 +11,11 @@
 #include "highgui.h" 
 #include <conio.h> 
 
+
+
+#define HIGH_THRESHOLD 75
+#define LOW_THRESHOLD 10
+
 using namespace cv;
 using namespace std;
 
@@ -27,26 +32,38 @@ int main(int argc, char* argv[]) {
 
 	int fileCount = input.FindFiles(argv[1]);
 
-	/*
+	
 
 	OutputHandler fileSaver = OutputHandler();
 	DotMaker dotImage = DotMaker();
 	
+	/*
+
 	dotImage.DisplayBlackImage();
 	cvWaitKey(0);
-	IplImage *frameColor = input.WebcamCapture(1);
-	frameColor = input.WebcamCapture(1);
-	fileSaver.SaveImage(frameColor);
+	IplImage *frameBackground = input.WebcamCapture(1);
+	frameBackground = input.WebcamCapture(1);
+	fileSaver.SaveImage(frameBackground);
 
 	dotImage.Distance = 50;
+
+	int i = 0;
 	
-	for (int i = 0; i < 6; i++) {
+	while(1){
 		dotImage.DisplayDotImage(10 * i);
-		IplImage *frameColor = input.WebcamCapture(1);
-		fileSaver.SaveImage(frameColor);
+		i++;
+		IplImage *frameInput = input.WebcamCapture(1);
+		fileSaver.SaveImage(frameInput);
+
+
+
+
+		printf("done!");
+
 	}
 
 	return 0;
+	
 	*/
 
 	namedWindow("Capture Display", WINDOW_AUTOSIZE);
@@ -61,8 +78,21 @@ int main(int argc, char* argv[]) {
 
 		IplImage *frameInput = cvLoadImage(input.paths[j].c_str(), 1);
 
-
 		IplImage *frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground);
+
+		IplImage *strongColors = ImageHandler::Colorize(frameColor, HIGH_THRESHOLD);
+
+		IplImage *frameGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
+		cvCvtColor(frameColor, frameGrey, COLOR_RGB2GRAY);
+
+
+		IplImage *colorBinary = ImageHandler::MakeBinary(frameGrey, LOW_THRESHOLD);
+
+		printf("Done!");
+
+	}
+
+	/*
 
 		if (frameColor != NULL) {
 
@@ -307,6 +337,8 @@ int main(int argc, char* argv[]) {
 
 		waitKey(0);
 	}
+
+	*/
 
 	return 0;
 
