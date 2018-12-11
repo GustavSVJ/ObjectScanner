@@ -244,7 +244,7 @@ void ObjectAnalyser::FindXY(ObjectAnalyser input[], int PointCounter, IplImage *
 
 	IplImage* img;
 
-	for (int i = 1; i < PointCounter; i++) {
+	for (int i = 0; i < PointCounter; i++) {
 		double xValue = 0.0;
 		double yValue = 0.0;
 		img = cvCreateImage(cvSize(input[i].GetObjectWidth(), input[i].GetObjectHeight()), IPL_DEPTH_8U, 1);

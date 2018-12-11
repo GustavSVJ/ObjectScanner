@@ -75,9 +75,9 @@ int main(int argc, char* argv[]) {
 	IplImage *frameBackground = cvLoadImage(input.paths[0].c_str(), 1);
 
 
-	for (int j = 1; j < fileCount; j++) {
+	for (int j = 0; j < fileCount -1; j++) {
 
-		IplImage *frameInput = cvLoadImage(input.paths[j].c_str(), 1);
+		IplImage *frameInput = cvLoadImage(input.paths[j+1].c_str(), 1);
 
 		IplImage *frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground);
 
@@ -350,66 +350,55 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
+
+
 			// Her må vi starte med at rette
 			double Xred[25] = { 0.0 };
 			double Yred[25] = { 0.0 };
 			// Her finder vi den absolutte X,Y position for prikken i billedet
-			ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xred, Yred);
+			ObjectAnalyser::FindXY(redRoI, redRoICounter, frameGrey, Xred, Yred);
 
 
-			//Bearbejder fundne regions of interest
-			for (int i = 0; i < RoICounter; i++) {
-				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
-				cvRectangle(frameColor, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
-				double Xblue[25] = { 0.0 };
-				double Yblue[25] = { 0.0 };
+			double Xgreen[25] = { 0.0 };
+			double Ygreen[25] = { 0.0 };
 
-				// Her finder vi den absolutte X,Y position for prikken i billedet
-				ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xblue, Yblue);
+			// Her finder vi den absolutte X,Y position for prikken i billedet
+			ObjectAnalyser::FindXY(greenRoI, greenRoICounter, frameGrey, Xgreen, Ygreen);
 
-				double Xgreen[10] = { 0.0 };
-				double Ygreen[10] = { 0.0 };
+			double Xblue[25] = { 0.0 };
+			double Yblue[25] = { 0.0 };
 
-				// Her finder vi den absolutte X,Y position for prikken i billedet
-				ObjectAnalyser::FindXY(RoI, RoICounter, frameGrey, Xgreen, Ygreen);
+			// Her finder vi den absolutte X,Y position for prikken i billedet
+			ObjectAnalyser::FindXY(blueRoI, blueRoICounter, frameGrey, Xblue, Yblue);
+			double Ysort[80] = { 0.0 };
+			double Xsort[80] = { 0.0 };
+			// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
+			ObjectAnalyser::SortingArray(Yred, Yblue, Ygreen, Ysort, Xred, Xblue, Xgreen, Xsort, 0);
 
-				// Test arrays til test af sorteringsfunktionen
-				double R1[2] = { 1,14 };
-				double B1[10] = { 2,4,6,8,10,12,14,0,0,0 };
-				double G1[10] = { 3,5,7,9,11,13,0,0,0,0 };
-				double Y1[25] = { 0 };
-				double R2[2] = { 1,14 };
-				double B2[10] = { 15,14,13,12,11,10,9,0,0,0 };
-				double G2[10] = { 3,5,7,9,11,13,0,0,0,0 };
-				double Y2[25] = { 0 };
-
-				// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
-				ObjectAnalyser::SortingArray(R1, B1, G1, Y1, R2, B2, G2, Y2, 0);
-
-				// Udskrivning af test af sorteringsfunktion
-				for (int i = 0; i < 26; i++) {
-					printf("y %lf\n", Y1[i]);
-					printf("x %lf\n", Y2[i]);
-				}
-
-				// Test af højde bestemmelses funktionen
-				ObjectAnalyser hej;
-
-				hej.init_Height(0.54, 0.24, 0.00517, 0.000002677);
-				hej.Reference_Calc(962);
-				double Height = hej.CalcObjectHeight(999);
-
-				printf("Height = %lf \n", Height);
-				printf("hej");
-
+			// Udskrivning af test af sorteringsfunktion
+			for (int i = 0; i < 80; i++) {
+				printf("y %lf\n", Ysort[i]);
+				printf("x %lf\n", Xsort[i]);
 			}
 
-			//waitKey(0);
+			// Test af højde bestemmelses funktionen
+			ObjectAnalyser hej;
+
+			hej.init_Height(0.54, 0.24, 0.00517, 0.000002677);
+			hej.Reference_Calc(962);
+			double Height = hej.CalcObjectHeight(999);
+
+			printf("Height = %lf \n", Height);
+			printf("hej");
+
 		}
 
-		return 0;
+		//waitKey(0);
 	}
+
+	return 0;
 }
+
 
 
 int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck) {
