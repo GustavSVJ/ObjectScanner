@@ -296,9 +296,10 @@ int main(int argc, char* argv[]) {
 			double Xstor[25] = { 0.0 };
 			double Ystor[25] = { 0.0 };
 
+			// Her finder vi den absolutte X,Y position for prikken i billedet
 			ObjectAnalyser::FindXY(RoI, RoICounter,frameGrey, Xstor, Ystor);
 
-
+			// Test arrays til test af sorteringsfunktionen
 			double R1[2] = { 1,14 };
 			double B1[10] = { 2,4,6,8,10,12,14,0,0,0 };
 			double G1[10] = { 3,5,7,9,11,13,0,0,0,0 };
@@ -308,13 +309,16 @@ int main(int argc, char* argv[]) {
 			double G2[10] = { 3,5,7,9,11,13,0,0,0,0 };
 			double Y2[25] = { 0 };
 
+			// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
 			ObjectAnalyser::SortingArray(R1, B1, G1, Y1, R2, B2, G2, Y2);
 
+			// Udskrivning af test af sorteringsfunktion
 			for (int i = 0; i < 26; i++) {
 				printf("y %lf\n", Y1[i]);
 				printf("x %lf\n", Y2[i]);
 			}
 
+			// Test af højde bestemmelses funktionen
 			ObjectAnalyser hej;
 
 			hej.init_Height(0.54, 0.24, 0.00517, 0.000002677);
