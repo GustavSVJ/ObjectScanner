@@ -82,6 +82,33 @@ int ObjectAnalyser::CheckForNoise(IplImage * referenceBinary) {
 	return 1;
 }
 
+dotColor ObjectAnalyser::CheckDotColor(IplImage * strongColor) {
+	int fullImageStartPixel = (TopLeft.x * TopLeft.y);
+	int fullImageEndPixel = ((BottomRight.x - TopLeft.x) * (BottomRight.y - TopLeft.y));
+
+	int redFound = 0;
+	int blueFound = 0;
+	int greenFound = 0;
+
+	for (int j = 0; j < ObjectImage->height; j++) {
+		int firstPixel = (TopLeft.y + 1 + j) * 1920 * 3 + ((TopLeft.x + 1) * 3);
+
+		for (int i = 0; i < ObjectImage->width; i++) {
+			if (strongColor->imageData[i * 3 + 0 + firstPixel] != 0) blueFound = 1;
+			if (strongColor->imageData[i * 3 + 1 + firstPixel] != 0) greenFound = 1;
+			if (strongColor->imageData[i * 3 + 2 + firstPixel] != 0) redFound = 1;
+		}
+	}
+
+	
+
+	if (blueFound && !redFound && !greenFound) return COLOR_BLUE;
+	if (!blueFound && redFound && !greenFound) return COLOR_RED;
+	if (!blueFound && !redFound && greenFound) return COLOR_GREEN;
+
+	return ERROR;
+}
+
 
 
 CvPoint ObjectAnalyser::GetObjectCenter(IplImage * input) {

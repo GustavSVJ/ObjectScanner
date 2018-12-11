@@ -14,7 +14,7 @@
 
 
 #define HIGH_THRESHOLD 75
-#define LOW_THRESHOLD 10
+#define LOW_THRESHOLD 15
 
 using namespace cv;
 using namespace std;
@@ -80,19 +80,6 @@ int main(int argc, char* argv[]) {
 
 		IplImage *frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground);
 
-		IplImage *strongColors = ImageHandler::Colorize(frameColor, HIGH_THRESHOLD);
-
-		IplImage *frameGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
-		cvCvtColor(frameColor, frameGrey, COLOR_RGB2GRAY);
-
-
-		IplImage *colorBinary = ImageHandler::MakeBinary(frameGrey, LOW_THRESHOLD);
-
-		printf("Done!");
-
-	}
-
-	/*
 
 		if (frameColor != NULL) {
 
@@ -112,7 +99,7 @@ int main(int argc, char* argv[]) {
 			IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
 			cvSet(objectMarkings, cvScalar(0));
 
-			ObjectAnalyser RoI[150];
+			ObjectAnalyser RoI[100];
 			int RoICounter = 1;
 
 			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {
@@ -298,25 +285,54 @@ int main(int argc, char* argv[]) {
 
 			}
 
-			IplImage *highThresholdBinary = cvCreateImage(cvSize(frameGrey->width, frameGrey->height), IPL_DEPTH_8U, 1);
+			IplImage *strongColors = ImageHandler::Colorize(frameColor, HIGH_THRESHOLD);
 
-			highThresholdBinary = ImageHandler::MakeBinary(frameGrey, 75);
+			IplImage *strongGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
+			cvCvtColor(strongColors, strongGrey, COLOR_RGB2GRAY);
 
+			IplImage *highThresholdBinary = cvCreateImage(cvSize(strongGrey->width, strongGrey->height), IPL_DEPTH_8U, 1);
+
+			highThresholdBinary = ImageHandler::MakeBinary(strongGrey, 10);
+
+			ObjectAnalyser redRoI[25];
+			int redRoICounter = 0;
+
+			ObjectAnalyser greenRoI[25];
+			int greenRoICounter = 0;
+
+			ObjectAnalyser blueRoI[25];
+			int blueRoICounter = 0;
 
 			IplImage* img;
-			int j = 0;
 			for (int i = 1; i < RoICounter; i++) {
 				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
 				RoI[i].GetObjectImage(frameGrey, img);
+				cvRectangle(frameColor, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 255, 255), 1, 8);
 				if (RoI[i].CheckForNoise(highThresholdBinary) == 0) {
-					RoI[j] = RoI[i];
-					j++;
+
+					dotColor color = RoI[i].CheckDotColor(strongColors);
+
+					if (color == COLOR_RED) {
+						redRoI[redRoICounter] = RoI[i];
+						redRoICounter++;
+						cvRectangle(frameColor, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(255, 0, 0), 1, 8);
+					}
+					else if (color == COLOR_BLUE) {
+						blueRoI[blueRoICounter] = RoI[i];
+						blueRoICounter++;
+						cvRectangle(frameColor, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(0, 0, 255), 1, 8);
+					}
+					else if (color == COLOR_GREEN) {
+						greenRoI[greenRoICounter] = RoI[i];
+						greenRoICounter++;
+						cvRectangle(frameColor, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(0, 255, 0), 1, 8);
+					}
+					else {
+						printf("The color couldn't be determined!");
+					}
 				}
 			}
-
-			RoICounter = j;
-
-			
+			/*
 			//Bearbejder fundne regions of interest
 			for (int i = 0; i < RoICounter; i++) {
 				img = cvCreateImage(cvSize(RoI[i].GetObjectWidth(), RoI[i].GetObjectHeight()), IPL_DEPTH_8U, 1);
@@ -331,14 +347,13 @@ int main(int argc, char* argv[]) {
 
 			}
 
+			*/
 			printf("Done!");
 
 		}
 
-		waitKey(0);
+		//waitKey(0);
 	}
-
-	*/
 
 	return 0;
 
