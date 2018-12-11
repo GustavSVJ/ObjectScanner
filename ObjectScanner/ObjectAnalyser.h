@@ -40,4 +40,6 @@ public:
 
 	static void FindXY(ObjectAnalyser input[], int PointCounter, IplImage *frame, double Xstor[], double Ystor[]);
 
+	static void SortingArray(double Red[], double Blue[], double Green[], double Y_color[], double xRed[], double xBlue[], double xGreen[], double X_color[]);
+
 };

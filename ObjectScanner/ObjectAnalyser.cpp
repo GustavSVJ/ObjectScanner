@@ -170,7 +170,7 @@ IplImage* ObjectAnalyser::ScaleFilter(IplImage* Orginalimg) {
 	}
 	int TEMP1 = 0, TEMP2 = 0, TEMP3 = 0, TEMP4 = 0, TEMP5 = 0, TEMP6 = 0, TEMP7 = 0, TEMP8 = 0, TEMP9 = 0;
 	int tempA;
-	for (int x = 1; x < Scaledimage->width-1; x++)
+	for (int x = 1; x < Scaledimage->width - 1; x++)
 	{
 		for (int y = 1; y < Scaledimage->height - 1; y++)
 		{
@@ -219,5 +219,57 @@ void ObjectAnalyser::FindXY(ObjectAnalyser input[], int PointCounter, IplImage *
 
 }
 
+void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[], double Y_color[], double xRed[], double xBlue[], double xGreen[], double X_color[]) {
+
+	int R = 0, G = 0, B = 0;
+	int c = 0;
+	int i = 0;
+	char Done = 1;
+		while (Done) {
+			switch (c)
+			{
+			case 0: // RØD
+				if (R > 1) {
+
+					Done = 0;
+					break;
+				}
+				else {
+					Y_color[i] = yRed[R];
+					X_color[i] = xRed[R];
+					R++;
+					i++;
+					c = 1;
+						break;
+				}
 
 
+			case 1: // BLÅ
+				if (yBlue[B] > 0) {
+					Y_color[i] = yBlue[B];
+					X_color[i] = xBlue[B];
+					B++;
+					i++;
+					c = 2;
+						break;
+				}
+				else
+					c = 0;
+				break;
+
+					case 2: // GRØN
+						if (yGreen[G] > 0) {
+							Y_color[i] = yGreen[G];
+							X_color[i] = xGreen[G];
+							G++;
+							i++;
+							c = 1;
+								break;
+						}
+						else {
+							c = 0;
+								break;
+						}
+			}
+		}
+}

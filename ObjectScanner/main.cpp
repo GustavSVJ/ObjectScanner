@@ -299,6 +299,24 @@ int main(int argc, char* argv[]) {
 			ObjectAnalyser::FindXY(RoI, RoICounter,frameGrey, Xstor, Ystor);
 
 
+			double R1[2] = { 1,14 };
+			double B1[10] = { 2,4,6,8,10,12,14,0,0,0 };
+			double G1[10] = { 3,5,7,9,11,13,0,0,0,0 };
+			double Y1[25] = { 0 };
+			double R2[2] = { 1,14 };
+			double B2[10] = { 15,14,13,12,11,10,9,0,0,0 };
+			double G2[10] = { 3,5,7,9,11,13,0,0,0,0 };
+			double Y2[25] = { 0 };
+
+			ObjectAnalyser::SortingArray(R1, B1, G1, Y1, R2, B2, G2, Y2);
+
+			for (int i = 0; i < 26; i++) {
+				printf("y %lf\n", Y1[i]);
+				printf("x %lf\n", Y2[i]);
+			}
+
+
+
 
 
 
