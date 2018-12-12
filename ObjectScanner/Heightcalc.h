@@ -12,7 +12,7 @@ public:
 
 	// variabler til højde beregning
 	double LightToObject, Baseline, FocalLength, AfstandPrPixel;
-	double K[80], C[80];
+	double K[100], C[100];
 	int Mid = 960;
 
 	double CalcObjectHeight(double y, double ref, int i);

@@ -23,7 +23,7 @@
 int X_distance = 0;
 int Input = 0;
 int temp_index = 0;
-double Xsort_ref[100] = { 0.0 };
+double Xsort_ref[100];
 using namespace cv;
 using namespace std;
 
@@ -79,6 +79,12 @@ int main(int argc, char* argv[]) {
 	namedWindow("Greyscale Display", WINDOW_AUTOSIZE);
 	namedWindow("Histogram Display", WINDOW_AUTOSIZE);
 	namedWindow("Binary Display", WINDOW_AUTOSIZE);
+
+	CvFont font;
+	double hScale = 1.0;
+	double vScale = 1.0;
+	int    lineWidth = 1;
+	cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX | CV_FONT_ITALIC, hScale, vScale, 0, lineWidth);
 
 	IplImage *frameBackground, *frameColor, *frameInput;
 
@@ -385,8 +391,8 @@ int main(int argc, char* argv[]) {
 
 				// Her finder vi den absolutte X,Y position for prikken i billedet
 				ObjectAnalyser::FindXY(blueRoI, blueRoICounter, frameGrey, Xblue, Yblue);
-				double Ysort[50] = { 0.0 };
-				double Xsort[50] = { 0.0 };
+				double Ysort[80] = { 0.0 };
+				double Xsort[80] = { 0.0 };
 				// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
 				ObjectAnalyser::SortingArray(Yred, Yblue, Ygreen, Ysort, Xred, Xblue, Xgreen, Xsort, 0);
 
@@ -397,20 +403,29 @@ int main(int argc, char* argv[]) {
 				Heightcalc hej;
 				// Beregner referencer for alle prikker, første gang..
 				if (moveX == 0) {
-					for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
+					/*for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
 						Xsort_ref[temp_index] = Xsort[i];
 						hej.init_Height(0.52, 0.26, 0.00517, 0.000002677);
 						hej.Reference_Calc(Xsort[i], temp_index);
 						temp_index++;
 						//printf("index = %d , K = %lf  ,  C = %lf  \n", i, hej.K[i], hej.C[i]);
+					}*/
+
+					for (int j = 0; j < 100; j++) {
+						Xsort_ref[j] = Xsort[0];
+						hej.init_Height(0.52, 0.26, 0.00517, 0.000002677);
+						hej.Reference_Calc(Xsort[0], j);
 					}
+
+					
 				}
 
 				// Beregner Z for alle punkter 
-				double Zsort[50] = { 0.0 };
+				double Zsort[80] = { 0.0 };
 				//if (moveX != 0) {
 				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
 					Zsort[i] = hej.CalcObjectHeight(Xsort[i], Xsort_ref[moveY * (greenRoICounter + redRoICounter + blueRoICounter) + i], i);
+					cvPutText(frameColor, "My comment", cvPoint(Xsort[i], Ysort[i]), &font, cvScalar(255, 255, 255));
 				}
 				//}
 
