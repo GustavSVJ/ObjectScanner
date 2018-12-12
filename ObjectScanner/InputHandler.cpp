@@ -51,7 +51,7 @@ int InputHandler::CheckArguments(int argc, char* argv[]) {
 		}
 	}
 
-	else if (argc < 3) {
+	if (argc < 3) {
 		printf("Did you remember to enter two arguments when launching the program?\n");
 		return 1;
 	}

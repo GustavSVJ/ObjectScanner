@@ -284,13 +284,13 @@ void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[]
 					X_color[i] = xGreen[G];
 					G++;
 					i++;
-
-					if (picturecounter == 0) {
+					c = 1;
+					/*if (picturecounter == 0) {
 						c = 1;
 					}
 					else {
 						c = 2;
-					}
+					}*/
 
 						break;
 				}
@@ -336,32 +336,3 @@ void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[]
 }
 
 
-
-
-
-void ObjectAnalyser::init_Height(double lightToObject, double baseLine, double focalLength, double aftandPrPixel) {
-		LightToObject = lightToObject;
-		Baseline = baseLine;
-		FocalLength = focalLength *0.887;
-		AfstandPrPixel = aftandPrPixel;
-	}
-
-void ObjectAnalyser::Reference_Calc(int x) {
-
-		double laengde = ((x - Mid)*AfstandPrPixel);
-
-		double vinkel_scene = atan(LightToObject / Baseline);
-		double vinkel_i = atan(laengde / FocalLength);
-
-		double temp = vinkel_scene + vinkel_i;
-		K = tan(temp);
-		C = Baseline * tan(vinkel_scene);
-
-	}
-
-double ObjectAnalyser::CalcObjectHeight(int y) {
-
-		double x = (y - Mid) * AfstandPrPixel; 
-		return (fabs((Baseline * (K - (x / FocalLength)) / (1 + K * (x / FocalLength))) - C));
-
-	}

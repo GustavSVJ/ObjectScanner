@@ -34,15 +34,15 @@ void OutputHandler::AddPoint(float x, float y, float z) {
 int OutputHandler::WriteFile(string outputDir) {
 
 	ofstream outputFile;
-	outputFile.open(outputDir + "\\pointCloud.ply");
-
+	outputFile.open(outputDir + "\\pointCloud.txt");
+	/*
 	outputFile << "ply\n";
 	outputFile << "format ascii 1.0\n";
 	outputFile << "element vertex " << pointCounter << "\n";
 	outputFile << "property float x\n";
 	outputFile << "property float y\n";
 	outputFile << "property float z\n";
-	outputFile << "end_header\n";
+	outputFile << "end_header\n";*/
 
 	for (int i = 0; i < pointCounter; i++) {
 		outputFile << points[i].x << " " << points[i].y << " " << points[i].z << "\n";
