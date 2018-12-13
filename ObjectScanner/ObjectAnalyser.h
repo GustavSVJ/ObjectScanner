@@ -62,4 +62,6 @@ public:
 	void Reference_Calc(int x);
 
 	void init_Height(double lightToObject, double baseLine, double focalLength, double aftandPrPixel);
+	
+	static void Histogramdrawer(int height, int width, char Scale, int *Histogram, IplImage* img, char Histogramid);
 };
