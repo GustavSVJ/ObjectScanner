@@ -21,12 +21,13 @@
 #define BottomGreen 20
 #define PICTURE_PR_MOVE 5
 int X_distance = 0;
-int Input = 0;
+
 int temp_index = 0;
 double Xsort_ref[100];
 using namespace cv;
 using namespace std;
 
+enum InputType { Camera, File };
 enum Direction { North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest };
 int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck);
 
@@ -39,84 +40,55 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	int fileCount = input.FindFiles(argv[1]);
-
-
+	InputType inputType = File;
+	string argString = argv[1];
+	int fileCount = 999;
 
 	OutputHandler fileSaver = OutputHandler();
 	DotMaker dotImage = DotMaker();
 
-	/*
 
-	dotImage.DisplayBlackImage();
-	cvWaitKey(0);
-	IplImage *frameBackground = input.WebcamCapture(1);
-	frameBackground = input.WebcamCapture(1);
-	fileSaver.SaveImage(frameBackground);
-
-	dotImage.Distance = 50;
-
-	int i = 0;
-
-	while(1){
-		dotImage.DisplayDotImage(10 * i);
-		i++;
-		IplImage *frameInput = input.WebcamCapture(1);
-		fileSaver.SaveImage(frameInput);
-
-
-
-
-		printf("done!");
-
+	if (argString == "camera") {
+		inputType = Camera;
+		dotImage.DisplayBlackImage();
+		cvWaitKey(0);
+	}
+	else {
+		fileCount = input.FindFiles(argv[1]);
 	}
 
-	return 0;
-
-	*/
-
-	namedWindow("Capture Display", WINDOW_AUTOSIZE);
-	namedWindow("Greyscale Display", WINDOW_AUTOSIZE);
-	namedWindow("Histogram Display", WINDOW_AUTOSIZE);
-	namedWindow("Binary Display", WINDOW_AUTOSIZE);
-
-	CvFont font;
-	double hScale = 1.0;
-	double vScale = 1.0;
-	int    lineWidth = 1;
-	cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX | CV_FONT_ITALIC, hScale, vScale, 0, lineWidth);
-
-	IplImage *frameBackground, *frameColor, *frameInput;
+	IplImage *frameBackground;
 
 	for (int moveX = 0; moveX < fileCount / (PICTURE_PR_MOVE + 1); moveX++) {
 
-		if (Input == 1)
+		if (inputType == Camera) {
+			dotImage.DisplayBlackImage();
 			frameBackground = input.WebcamCapture(1);
+			fileSaver.SaveImage(frameBackground);
+		}
 		else
 			frameBackground = cvLoadImage(input.paths[(PICTURE_PR_MOVE + 1) * moveX].c_str(), 1);
 
-		for (int moveY = 0; moveY < PICTURE_PR_MOVE ; moveY++) { //fileCount - 1
+		for (int moveY = 0; moveY < PICTURE_PR_MOVE; moveY++) { //fileCount - 1
 
-			if (Input == 1)
+			IplImage *frameColor, *frameInput;
+
+			if (inputType == Camera) {
+				dotImage.Distance = 50;
+				dotImage.DisplayDotImage(10 * moveY);
 				frameInput = input.WebcamCapture(1);
+				fileSaver.SaveImage(frameBackground);
+			}
 			else
 				frameInput = cvLoadImage(input.paths[(PICTURE_PR_MOVE + 1) * moveX + moveY + 1].c_str(), 1);
 
 			frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground);
 
-
-			cvShowImage("Capture Display", frameColor);
-
-
 			IplImage *frameGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 			cvCvtColor(frameColor, frameGrey, COLOR_RGB2GRAY);
 
-			cvShowImage("Greyscale Display", frameGrey);
-
 			IplImage *frameBinary = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 			frameBinary = ImageHandler::MakeBinary(frameGrey, LOW_THRESHOLD);
-
-			cvShowImage("Binary Display", frameBinary);
 
 			IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
 			cvSet(objectMarkings, cvScalar(0));
@@ -309,7 +281,6 @@ int main(int argc, char* argv[]) {
 								break;
 							}
 						}
-						//cvShowImage("Capture Display", objectMarkings);
 						moveOn = 0;
 					}
 
@@ -325,6 +296,8 @@ int main(int argc, char* argv[]) {
 						cvRectangle(frameColor, RoI[RoICounter].TopLeft, RoI[RoICounter].BottomRight, CV_RGB(255, 255, 0), 1, 8);
 						RoI[RoICounter] = ObjectAnalyser(frameBinary->height, frameBinary->width);
 					}
+
+					cvReleaseImage(&img);
 
 				}
 
@@ -368,7 +341,9 @@ int main(int argc, char* argv[]) {
 					else {
 						printf("The color couldn't be determined!");
 					}
+
 				}
+
 			}
 
 			if (greenRoICounter == 2) {
@@ -417,7 +392,7 @@ int main(int argc, char* argv[]) {
 						hej.Reference_Calc(Xsort[0], j);
 					}
 
-					
+
 				}
 
 				// Beregner Z for alle punkter 
@@ -425,7 +400,6 @@ int main(int argc, char* argv[]) {
 				//if (moveX != 0) {
 				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
 					Zsort[i] = hej.CalcObjectHeight(Xsort[i], Xsort_ref[moveY * (greenRoICounter + redRoICounter + blueRoICounter) + i], i);
-					cvPutText(frameColor, "My comment", cvPoint(Xsort[i], Ysort[i]), &font, cvScalar(255, 255, 255));
 				}
 				//}
 
@@ -439,7 +413,7 @@ int main(int argc, char* argv[]) {
 					else if (i == (greenRoICounter + redRoICounter + blueRoICounter - 1))
 						Ysort[i] = BottomGreen;
 					else
-						Ysort[i] = Y_distanceprpoint * i + offset * moveY; 
+						Ysort[i] = Y_distanceprpoint * i + offset * moveY;
 
 					Zsort[i] = Zsort[i] * 100;
 				}
@@ -458,7 +432,7 @@ int main(int argc, char* argv[]) {
 				printf("Unable to determine edges of measurement...\n");
 
 
-
+			cvReleaseImage(&img);
 			cvReleaseImage(&frameInput);
 			cvReleaseImage(&frameColor);
 			cvReleaseImage(&frameGrey);
@@ -467,9 +441,15 @@ int main(int argc, char* argv[]) {
 			cvReleaseImage(&strongColors);
 
 		}
-		//waitKey(0);
-		//return(0);
-		printf("hej");
+
+		cvReleaseImage(&frameBackground);
+
+		if (inputType == Camera) {
+			if (waitKey(0) == 'c') {
+				break;
+			}
+		}
+
 	}
 	fileSaver.WriteFile(argv[2]);
 	return 0;

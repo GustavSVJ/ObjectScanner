@@ -28,6 +28,7 @@ ObjectAnalyser::ObjectAnalyser(int imageHeight, int imageWidth) {
 
 ObjectAnalyser::~ObjectAnalyser()
 {
+	//cvReleaseImage(&ObjectImage);
 }
 
 
