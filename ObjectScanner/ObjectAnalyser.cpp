@@ -119,6 +119,11 @@ void ObjectAnalyser::GetObjectCenter(IplImage * input, double * xValue, double *
 
 	*xValue = (xpos(input) / 2.0);
 	*yValue = (ypos(input) / 2.0);
+	IplImage *Histogramx = cvCreateImage(cvSize(input->height, input->width), IPL_DEPTH_8U, 1);
+	Histogramdrawer(input->height, input->width, 2, histogramxaxis, Histogramx, 'x');
+
+	IplImage *Histogramy = cvCreateImage(cvSize(input->height, input->width), IPL_DEPTH_8U, 1);
+	Histogramdrawer(input->width, input->height, 2, histogramyaxis, Histogramy, 'y'); // height og width er omvendt af x aksensen.
 
 
 
@@ -156,6 +161,13 @@ void ObjectAnalyser::GetObjectCenter(IplImage * input, double * xValue, double *
 	*/
 }
 
+void ObjectAnalyser::Histogramdrawer(int height, int width, char Scale, int *Histogram, IplImage* img, char Histogramid) {
+	for (int j = 0; j < width; j++)
+	{
+
+		cvLine(img, cvPoint(j, height), cvPoint(j, height - (Histogram[j]) / Scale), cvScalar(40, 150, 0), 1);
+	}
+}
 
 void ObjectAnalyser::histoy(IplImage* input) {
 	for (int j = 0; j < input->height; j++) {

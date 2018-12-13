@@ -52,4 +52,11 @@ public:
 
 	static void SortingArray(double Red[], double Blue[], double Green[], double Y_color[], double xRed[], double xBlue[], double xGreen[], double X_color[], int picturecounter);
 
+	double CalcObjectHeight(int y);
+
+	void Reference_Calc(int x);
+
+	void init_Height(double lightToObject, double baseLine, double focalLength, double aftandPrPixel);
+	
+	static void Histogramdrawer(int height, int width, char Scale, int *Histogram, IplImage* img, char Histogramid);
 };
