@@ -14,8 +14,9 @@
 
 
 
-#define HIGH_THRESHOLD 100
+#define HIGH_THRESHOLD 80
 #define LOW_THRESHOLD 5
+#define BACKGROUND_THRESHOLD 25
 #define Y_distanceprpoint 1
 #define offset 0.5
 #define BottomGreen 20
@@ -46,7 +47,6 @@ int main(int argc, char* argv[]) {
 
 	OutputHandler fileSaver = OutputHandler();
 	DotMaker dotImage = DotMaker();
-
 
 	if (argString == "camera") {
 		inputType = Camera;
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 			else
 				frameInput = cvLoadImage(input.paths[(PICTURE_PR_MOVE + 1) * moveX + moveY + 1].c_str(), 1);
 
-			frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground);
+			frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground, BACKGROUND_THRESHOLD);
 
 			IplImage *frameGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 			cvCvtColor(frameColor, frameGrey, COLOR_RGB2GRAY);

@@ -1,5 +1,5 @@
 #include "ImageHandler.h"
-
+#include <math.h>
 
 
 ImageHandler::ImageHandler()
@@ -31,14 +31,29 @@ IplImage * ImageHandler::MakeBinary(IplImage * input, int threshold) {
 
 }
 
-IplImage * ImageHandler::RemoveBackground(IplImage * input, IplImage * background) {
+IplImage * ImageHandler::RemoveBackground(IplImage * input, IplImage * background, int threshhold) {
 	IplImage * output = cvCreateImage(cvSize(input->width, input->height), IPL_DEPTH_8U, 3);
 
 	for (int i = 0; i < input->height; i++) {
-		for (int j = 0; j < input->width * 3; j++) {
-			int pixelValue = (unsigned char)input->imageData[j + i * (input->widthStep)] - (unsigned char)background->imageData[j + i * (input->widthStep)];
-			if (pixelValue < 0) pixelValue = 0;
-			output->imageData[j + i * (input->widthStep)] = pixelValue;
+		for (int j = 0; j < input->width; j++) {
+			int change = 0;
+
+			for (int k = 0; k < 3; k++) {
+				int pixelValue = (unsigned char)input->imageData[j * 3 + k + i * (input->widthStep)] - (unsigned char)background->imageData[j * 3 + k + i * (input->widthStep)];
+				if (abs(pixelValue) > threshhold) {
+					change = 1;
+				}
+			}
+
+			for (int k = 0; k < 3; k++) {
+				if (change == 1) {
+					output->imageData[j * 3 + k + i * (input->widthStep)] = (unsigned char)input->imageData[j * 3 + k + i * (input->widthStep)];
+				}
+				else {
+					output->imageData[j * 3 + k + i * (input->widthStep)] = 0;
+				}
+				
+			}
 		}
 	}
 

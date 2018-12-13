@@ -9,7 +9,7 @@ class ImageHandler
 {
 public:
 	static IplImage * MakeBinary(IplImage * input, int threshold);
-	static IplImage * RemoveBackground(IplImage * input, IplImage * background);
+	static IplImage * RemoveBackground(IplImage * input, IplImage * background, int threshhold);
 	static void DisplayHistogram(IplImage * image, int lowValue, int highValue);
 
 	static IplImage * GetRedChannel(IplImage * input);
