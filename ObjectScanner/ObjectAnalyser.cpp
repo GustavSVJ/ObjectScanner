@@ -19,7 +19,7 @@ ObjectAnalyser::ObjectAnalyser()
 ObjectAnalyser::ObjectAnalyser(int imageHeight, int imageWidth) {
 	TopLeft = cvPoint(imageWidth - 1, imageHeight - 1);
 	BottomRight = cvPoint(0, 0);
-	
+
 	ImageWidth = imageWidth;
 	memset(histogramyaxis, 0, 256);
 	memset(histogramxaxis, 0, 1100);
@@ -28,7 +28,9 @@ ObjectAnalyser::ObjectAnalyser(int imageHeight, int imageWidth) {
 
 ObjectAnalyser::~ObjectAnalyser()
 {
-	//cvReleaseImage(&ObjectImage);
+	if (!ObjectImage) {
+		cvReleaseImage(&ObjectImage);
+	}
 }
 
 
@@ -101,7 +103,7 @@ dotColor ObjectAnalyser::CheckDotColor(IplImage * strongColor) {
 		}
 	}
 
-	
+
 
 	if (blueFound && !redFound && !greenFound) return COLOR_BLUE;
 	if (!blueFound && redFound && !greenFound) return COLOR_RED;
@@ -266,74 +268,74 @@ void ObjectAnalyser::FindXY(ObjectAnalyser input[], int PointCounter, IplImage *
 
 void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[], double Y_color[], double xRed[], double xBlue[], double xGreen[], double X_color[], int picturecounter) {
 
-	
+
 	int R = 0, G = 0, B = 0;
 	int c = 0;
 	int i = 0;
 	char Done = 1;
-		while (Done) {
-			switch (c)
-			{
-			case 0: // Grøn
-				if (G > 1) {
+	while (Done) {
+		switch (c)
+		{
+		case 0: // Grøn
+			if (G > 1) {
 
-					Done = 0;
-					break;
+				Done = 0;
+				break;
+			}
+			else {
+				Y_color[i] = yGreen[G];
+				X_color[i] = xGreen[G];
+				G++;
+				i++;
+				c = 1;
+				/*if (picturecounter == 0) {
+					c = 1;
 				}
 				else {
-					Y_color[i] = yGreen[G];
-					X_color[i] = xGreen[G];
-					G++;
-					i++;
-					c = 1;
-					/*if (picturecounter == 0) {
-						c = 1;
-					}
-					else {
-						c = 2;
-					}*/
-
-						break;
-				}
-
-
-			case 1: // BLÅ
-				if (yBlue[B] > 0) {
-					Y_color[i] = yBlue[B];
-					X_color[i] = xBlue[B];
-					B++;
-					i++;
 					c = 2;
-					break;
+				}*/
+
+				break;
+			}
+
+
+		case 1: // BLÅ
+			if (yBlue[B] > 0) {
+				Y_color[i] = yBlue[B];
+				X_color[i] = xBlue[B];
+				B++;
+				i++;
+				c = 2;
+				break;
+			}
+			else
+				if (yRed[R] > 0) {
+					c = 2;
 				}
 				else
-					if (yRed[R] > 0) {
-						c = 2;
-					}
-					else
-						c = 0;
-				break;
+					c = 0;
+			break;
 
-					case 2: // Rød
-						if (yRed[R] > 0) {
-							Y_color[i] = yRed[R];
-							X_color[i] = xRed[R];
-							R++;
-							i++;
-							c = 1;
-								break;
-						}
-						else {
-							if (yBlue[B] > 0) {
-								c = 1;
-							}
-							else {
-								c = 0;
-							}
-								break;
-						}
+		case 2: // Rød
+			if (yRed[R] > 0) {
+				Y_color[i] = yRed[R];
+				X_color[i] = xRed[R];
+				R++;
+				i++;
+				c = 1;
+				break;
+			}
+			else {
+				if (yBlue[B] > 0) {
+					c = 1;
+				}
+				else {
+					c = 0;
+				}
+				break;
 			}
 		}
+	}
 }
 
 

@@ -439,6 +439,8 @@ int main(int argc, char* argv[]) {
 			cvReleaseImage(&frameBinary);
 			cvReleaseImage(&objectMarkings);
 			cvReleaseImage(&strongColors);
+			cvReleaseImage(&strongGrey);
+			cvReleaseImage(&highThresholdBinary);
 
 		}
 
