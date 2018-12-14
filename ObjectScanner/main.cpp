@@ -15,12 +15,13 @@
 
 
 #define HIGH_THRESHOLD 80
+#define COLOR_THRESHOLD 25
 #define LOW_THRESHOLD 5
-#define BACKGROUND_THRESHOLD 25
+#define BACKGROUND_THRESHOLD 5
 #define Y_distanceprpoint 1
 #define offset 0.5
 #define BottomGreen 20
-#define PICTURE_PR_MOVE 5
+#define PICTURE_PR_MOVE 1
 int X_distance = 0;
 
 int temp_index = 0;
@@ -93,14 +94,11 @@ int main(int argc, char* argv[]) {
 			IplImage *objectMarkings = cvCreateImage(cvSize(frameBinary->width, frameBinary->height), IPL_DEPTH_8U, 1);
 			cvSet(objectMarkings, cvScalar(0));
 
-			IplImage *strongColors = ImageHandler::Colorize(frameColor, HIGH_THRESHOLD);
+			IplImage *strongColors = ImageHandler::Colorize(frameColor, COLOR_THRESHOLD);
 
-			IplImage *strongGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
-			cvCvtColor(strongColors, strongGrey, COLOR_RGB2GRAY);
+			IplImage *highThresholdBinary = cvCreateImage(cvSize(frameGrey->width, frameGrey->height), IPL_DEPTH_8U, 1);
 
-			IplImage *highThresholdBinary = cvCreateImage(cvSize(strongGrey->width, strongGrey->height), IPL_DEPTH_8U, 1);
-
-			highThresholdBinary = ImageHandler::MakeBinary(strongGrey, 10);
+			highThresholdBinary = ImageHandler::MakeBinary(frameGrey, HIGH_THRESHOLD);
 
 
 
@@ -439,7 +437,6 @@ int main(int argc, char* argv[]) {
 			cvReleaseImage(&frameBinary);
 			cvReleaseImage(&objectMarkings);
 			cvReleaseImage(&strongColors);
-			cvReleaseImage(&strongGrey);
 			cvReleaseImage(&highThresholdBinary);
 
 		}
