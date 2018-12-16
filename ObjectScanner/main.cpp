@@ -14,14 +14,14 @@
 
 
 
-#define HIGH_THRESHOLD 25
+#define HIGH_THRESHOLD 70
 #define COLOR_THRESHOLD 25
 #define LOW_THRESHOLD 5
 #define BACKGROUND_THRESHOLD 5
 #define Y_distanceprpoint 1
 #define offset 0.5
 #define BottomGreen 20
-#define PICTURE_PR_MOVE 2
+#define PICTURE_PR_MOVE 5
 int X_distance = 0;
 
 int temp_index = 0;
@@ -85,8 +85,9 @@ int main(int argc, char* argv[]) {
 
 			frameColor = ImageHandler::RemoveBackground(frameInput, frameBackground, BACKGROUND_THRESHOLD);
 
-			IplImage *frameGrey = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
-			cvCvtColor(frameColor, frameGrey, COLOR_RGB2GRAY);
+			IplImage *frameGrey = ImageHandler::CvtToGrey(frameColor); //cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
+			//cvCvtColor(frameColor, frameGrey, COLOR_RGB2GRAY);
+			
 
 			IplImage *frameBinary = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 			frameBinary = ImageHandler::MakeBinary(frameGrey, LOW_THRESHOLD);

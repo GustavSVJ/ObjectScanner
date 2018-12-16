@@ -17,6 +17,8 @@ public:
 	static IplImage * GetGreenChannel(IplImage * input);
 
 	static IplImage * Colorize(IplImage * input, int threshold);
+	static IplImage * CvtToGrey(IplImage * input);
+
 
 private:
 	ImageHandler();
