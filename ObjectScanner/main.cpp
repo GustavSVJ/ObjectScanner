@@ -14,14 +14,14 @@
 
 
 
-#define HIGH_THRESHOLD 80
+#define HIGH_THRESHOLD 25
 #define COLOR_THRESHOLD 25
 #define LOW_THRESHOLD 5
 #define BACKGROUND_THRESHOLD 5
 #define Y_distanceprpoint 1
 #define offset 0.5
 #define BottomGreen 20
-#define PICTURE_PR_MOVE 1
+#define PICTURE_PR_MOVE 2
 int X_distance = 0;
 
 int temp_index = 0;
@@ -99,8 +99,6 @@ int main(int argc, char* argv[]) {
 			IplImage *highThresholdBinary = cvCreateImage(cvSize(frameGrey->width, frameGrey->height), IPL_DEPTH_8U, 1);
 
 			highThresholdBinary = ImageHandler::MakeBinary(frameGrey, HIGH_THRESHOLD);
-
-
 
 			ObjectAnalyser RoI[100];
 			int RoICounter = 1;
@@ -408,10 +406,10 @@ int main(int argc, char* argv[]) {
 					Xsort[i] = moveX;
 					if (i == 0)
 						Ysort[i] = 0;
-					else if (i == (greenRoICounter + redRoICounter + blueRoICounter - 1))
-						Ysort[i] = BottomGreen;
-					else
+					else if (moveY == 0)
 						Ysort[i] = Y_distanceprpoint * i + offset * moveY;
+					else
+						Ysort[i] = Y_distanceprpoint * (i - 1) + offset * moveY;
 
 					Zsort[i] = Zsort[i] * 100;
 				}
