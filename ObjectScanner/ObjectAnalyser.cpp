@@ -273,7 +273,6 @@ void ObjectAnalyser::FindXY(ObjectAnalyser input[], int PointCounter, IplImage *
 		Ystor[i] = yValue + 1 + input[i].TopLeft.y;
 		cvLine(img, smallImageCenter, smallImageCenter, cvScalar(255), 1, 8);
 		cvLine(frame, bigImageCenter, bigImageCenter, CV_RGB(255, 0, 0), 1, 8);
-		printf("Done!");
 	}
 
 }

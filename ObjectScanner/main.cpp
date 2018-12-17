@@ -14,7 +14,7 @@
 
 
 
-#define HIGH_THRESHOLD 75
+#define HIGH_THRESHOLD 30
 #define COLOR_THRESHOLD 25
 #define LOW_THRESHOLD 5
 #define BACKGROUND_THRESHOLD 25
@@ -162,7 +162,6 @@ int main(int argc, char* argv[]) {
 									moveOn = 1;
 									movingTowards = East;
 									startPixel = pixelToCheck;
-									printf("Error!");
 								}
 								break;
 							case NorthEast:
@@ -180,7 +179,6 @@ int main(int argc, char* argv[]) {
 									moveOn = 1;
 									movingTowards = East;
 									startPixel = pixelToCheck;
-									printf("Error!");
 								}
 								break;
 							case East:
@@ -198,7 +196,6 @@ int main(int argc, char* argv[]) {
 									moveOn = 1;
 									movingTowards = East;
 									startPixel = pixelToCheck;
-									printf("Error!");
 								}
 								break;
 							case SouthEast:
@@ -215,7 +212,6 @@ int main(int argc, char* argv[]) {
 									moveOn = 1;
 									movingTowards = East;
 									startPixel = pixelToCheck;
-									printf("Error!");
 								}
 								break;
 							case South:
@@ -232,7 +228,6 @@ int main(int argc, char* argv[]) {
 									moveOn = 1;
 									movingTowards = East;
 									startPixel = pixelToCheck;
-									printf("Error!");
 								}
 								break;
 							case SouthWest:
@@ -249,7 +244,6 @@ int main(int argc, char* argv[]) {
 									moveOn = 1;
 									movingTowards = East;
 									startPixel = pixelToCheck;
-									printf("Error!");
 								}
 								break;
 							case West:
@@ -266,7 +260,6 @@ int main(int argc, char* argv[]) {
 									moveOn = 1;
 									movingTowards = East;
 									startPixel = pixelToCheck;
-									printf("Error!");
 								}
 								break;
 							case NorthWest:
@@ -283,11 +276,9 @@ int main(int argc, char* argv[]) {
 									moveOn = 1;
 									movingTowards = East;
 									startPixel = pixelToCheck;
-									printf("Error!");
 								}
 								break;
 							default:
-								printf("Error!");
 								break;
 							}
 						}
@@ -353,12 +344,13 @@ int main(int argc, char* argv[]) {
 						greenRoICounter++;
 						cvRectangle(frameColor, RoI[i].TopLeft, RoI[i].BottomRight, CV_RGB(0, 255, 0), 1, 8);
 					}
-					else {
-						printf("The color couldn't be determined!");
-					}
 
 				}
 
+			}
+
+			if (greenRoICounter != 2 || (greenRoICounter + redRoICounter + blueRoICounter < 24 || greenRoICounter + redRoICounter + blueRoICounter > 25)) {
+				printf("Error in picture %d", (PICTURE_PR_MOVE + 1) * moveX + moveY + 1);
 			}
 
 			if (greenRoICounter == 2) {
@@ -435,16 +427,13 @@ int main(int argc, char* argv[]) {
 
 
 				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
-					printf("y %lf |", Ysort[i]);
-					printf("x %lf |", Xsort[i]);
-					printf("Z %lf\n", Zsort[i]);
+					//printf("y %lf |", Ysort[i]);
+					//printf("x %lf |", Xsort[i]);
+					//printf("Z %lf\n", Zsort[i]);
 					fileSaver.AddPoint(Xsort[i], Ysort[i], Zsort[i]);
 				}
-				printf("hej");
 
 			}
-			else
-				printf("Unable to determine edges of measurement...\n");
 
 
 			cvReleaseImage(&img);

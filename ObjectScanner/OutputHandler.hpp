@@ -6,7 +6,7 @@
 #include "highgui.h" 
 #include <conio.h> 
 
-#define MAX_OUTPUT_POINTS 1000
+#define MAX_OUTPUT_POINTS 3000
 
 using namespace std;
 namespace fs = std::experimental::filesystem;
