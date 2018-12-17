@@ -14,14 +14,14 @@
 
 
 
-#define HIGH_THRESHOLD 70
+#define HIGH_THRESHOLD 75
 #define COLOR_THRESHOLD 25
 #define LOW_THRESHOLD 5
-#define BACKGROUND_THRESHOLD 5
-#define Y_distanceprpoint 1
-#define offset 0.5
-#define BottomGreen 20
-#define PICTURE_PR_MOVE 5
+#define BACKGROUND_THRESHOLD 25
+#define Y_distanceprpoint 0.6f
+#define offset 0.3f
+#define BottomGreen 13.6f
+#define PICTURE_PR_MOVE 2
 int X_distance = 0;
 
 int temp_index = 0;
@@ -51,17 +51,19 @@ int main(int argc, char* argv[]) {
 
 	if (argString == "camera") {
 		inputType = Camera;
-		dotImage.Distance = 50;
+		dotImage.Distance = 40;
 		dotImage.DisplayDotImage(0);
-		
+
 
 		namedWindow("TestPicture", WINDOW_NORMAL);
 
 		while (cvWaitKey(0) != 'c') {
-			IplImage * testFrame =  input.WebcamCapture(1);
+			IplImage * testFrame = input.WebcamCapture(1);
 			cvShowImage("TestPicture", testFrame);
 			cvReleaseImage(&testFrame);
 		}
+
+		cvDestroyWindow("TestPicture");
 
 	}
 	else {
@@ -85,10 +87,11 @@ int main(int argc, char* argv[]) {
 			IplImage *frameColor, *frameInput;
 
 			if (inputType == Camera) {
-				dotImage.Distance = 50;
-				dotImage.DisplayDotImage(10 * moveY);
+				dotImage.Distance = 40;
+				dotImage.ymax = 1020;
+				dotImage.DisplayDotImage(20 * moveY);
 				frameInput = input.WebcamCapture(1);
-				fileSaver.SaveImage(frameBackground);
+				fileSaver.SaveImage(frameInput);
 			}
 			else
 				frameInput = cvLoadImage(input.paths[(PICTURE_PR_MOVE + 1) * moveX + moveY + 1].c_str(), 1);
@@ -97,7 +100,7 @@ int main(int argc, char* argv[]) {
 
 			IplImage *frameGrey = ImageHandler::CvtToGrey(frameColor); //cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 			//cvCvtColor(frameColor, frameGrey, COLOR_RGB2GRAY);
-			
+
 
 			IplImage *frameBinary = cvCreateImage(cvSize(frameColor->width, frameColor->height), IPL_DEPTH_8U, 1);
 			frameBinary = ImageHandler::MakeBinary(frameGrey, LOW_THRESHOLD);
@@ -291,21 +294,26 @@ int main(int argc, char* argv[]) {
 						moveOn = 0;
 					}
 
-					IplImage* img;
-					img = cvCreateImage(cvSize(RoI[RoICounter].GetObjectWidth(), RoI[RoICounter].GetObjectHeight()), IPL_DEPTH_8U, 1);
-					RoI[RoICounter].GetObjectImage(frameGrey, img);
-					cvRectangle(frameColor, RoI[RoICounter].TopLeft, RoI[RoICounter].BottomRight, CV_RGB(0, 255, 255), 1, 8);
-
-					if (RoI[RoICounter].CheckForNoise(highThresholdBinary) == 0) {
-						RoICounter++;
-					}
-					else {
-						cvRectangle(frameColor, RoI[RoICounter].TopLeft, RoI[RoICounter].BottomRight, CV_RGB(255, 255, 0), 1, 8);
+					if (RoI[RoICounter].TopLeft.x < 0 || RoI[RoICounter].TopLeft.y < 0) {
 						RoI[RoICounter] = ObjectAnalyser(frameBinary->height, frameBinary->width);
 					}
+					else {
 
-					cvReleaseImage(&img);
+						IplImage* img;
+						img = cvCreateImage(cvSize(RoI[RoICounter].GetObjectWidth(), RoI[RoICounter].GetObjectHeight()), IPL_DEPTH_8U, 1);
+						RoI[RoICounter].GetObjectImage(frameGrey, img);
+						cvRectangle(frameColor, RoI[RoICounter].TopLeft, RoI[RoICounter].BottomRight, CV_RGB(0, 255, 255), 1, 8);
 
+						if (RoI[RoICounter].CheckForNoise(highThresholdBinary) == 0) {
+							RoICounter++;
+						}
+						else {
+							cvRectangle(frameColor, RoI[RoICounter].TopLeft, RoI[RoICounter].BottomRight, CV_RGB(255, 255, 0), 1, 8);
+							RoI[RoICounter] = ObjectAnalyser(frameBinary->height, frameBinary->width);
+						}
+
+						cvReleaseImage(&img);
+					}
 				}
 
 			}

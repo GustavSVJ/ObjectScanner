@@ -129,21 +129,21 @@ IplImage * ImageHandler::Colorize(IplImage * input, int threshold) {
 			int blueColor = (unsigned char)input->imageData[j * 3 + 0 + i * (input->widthStep)];
 			int greenColor = (unsigned char)input->imageData[j * 3 + 1 + i * (input->widthStep)];
 
-			if (blueColor > redColor && blueColor > greenColor && blueColor > threshold) {
+			if (blueColor - redColor > threshold && blueColor - greenColor > threshold) {
 				output->imageData[j * 3 + 0 + i * (output->widthStep)] = 255;
 			}
 			else {
 				output->imageData[j * 3 + 0 + i * (output->widthStep)] = 0;
 			}
 
-			if (redColor > blueColor && redColor > greenColor && redColor > threshold) {
+			if (redColor - blueColor > threshold && redColor - greenColor > threshold) {
 				output->imageData[j * 3 + 2 + i * (output->widthStep)] = 255;
 			}
 			else {
 				output->imageData[j * 3 + 2 + i * (output->widthStep)] = 0;
 			}
 
-			if (greenColor > redColor && greenColor > blueColor && greenColor > threshold) {
+			if (greenColor - redColor > threshold && greenColor - blueColor > threshold) {
 				output->imageData[j * 3 + 1 + i * (output->widthStep)] = 255;
 			}
 			else {

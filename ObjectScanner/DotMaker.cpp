@@ -51,8 +51,8 @@ void DotMaker::DisplayDotImage(int offset) {
 		y += Distance;
 	}
 
-	cvCircle(img, cvPoint(x, ymin), 5, cvScalar(0, 255, 0), -1, 8, 0);
-	cvCircle(img, cvPoint(x, ymax), 5, cvScalar(0, 255, 0), -1, 8, 0);
+	cvCircle(img, cvPoint(x, ymin), 5, cvScalar(0, 200, 0), -1, 8, 0);
+	cvCircle(img, cvPoint(x, ymax), 5, cvScalar(0, 200, 0), -1, 8, 0);
 
 	cvShowImage("DotPlot", img);
 	cvWaitKey(500);
