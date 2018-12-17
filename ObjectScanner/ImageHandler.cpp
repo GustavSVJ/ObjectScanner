@@ -60,6 +60,24 @@ IplImage * ImageHandler::RemoveBackground(IplImage * input, IplImage * backgroun
 	return output;
 }
 
+IplImage * ImageHandler::CvtToGrey(IplImage * input) {
+	IplImage * output = cvCreateImage(cvSize(input->width, input->height), IPL_DEPTH_8U, 1);
+
+	for (int i = 0; i < input->height; i++) {
+		for (int j = 0; j < input->width; j++) {
+			int pixelValue = 0;
+
+			for (int k = 0; k < 3; k++) {
+				pixelValue += (unsigned char)input->imageData[j * 3 + k + i * (input->widthStep)];
+			}
+
+			output->imageData[j + i * (output->widthStep)] = (unsigned char)(pixelValue / 3);
+		}
+	}
+
+	return output;
+}
+
 IplImage * ImageHandler::GetRedChannel(IplImage * input) {
 	IplImage * output = cvCreateImage(cvSize(input->width, input->height), IPL_DEPTH_8U, 1);
 
