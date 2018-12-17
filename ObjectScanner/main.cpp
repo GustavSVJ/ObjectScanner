@@ -51,8 +51,18 @@ int main(int argc, char* argv[]) {
 
 	if (argString == "camera") {
 		inputType = Camera;
-		dotImage.DisplayBlackImage();
-		cvWaitKey(0);
+		dotImage.Distance = 50;
+		dotImage.DisplayDotImage(0);
+		
+
+		namedWindow("TestPicture", WINDOW_NORMAL);
+
+		while (cvWaitKey(0) != 'c') {
+			IplImage * testFrame =  input.WebcamCapture(1);
+			cvShowImage("TestPicture", testFrame);
+			cvReleaseImage(&testFrame);
+		}
+
 	}
 	else {
 		fileCount = input.FindFiles(argv[1]);

@@ -8,6 +8,7 @@ DotMaker::DotMaker()
 {
 	img = cvCreateImage(cvSize(1920, 1080), 8, 3);
 	namedWindow("DotPlot", WINDOW_NORMAL);
+	cvWaitKey(0);
 	setWindowProperty("DotPlot", WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
 }
 
