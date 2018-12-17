@@ -37,6 +37,17 @@ int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck);
 
 int main(int argc, char* argv[]) {
 
+
+	while (1) {
+		DotMaker test = DotMaker();
+
+		CvScalar testColor = CV_RGB(255, 0, 0);
+
+		test.DisplayColorImage(testColor);
+
+		cvWaitKey(0);
+	}
+
 	InputHandler input = InputHandler();
 	if (input.CheckArguments(argc, argv)) {
 		return 1;
@@ -54,7 +65,7 @@ int main(int argc, char* argv[]) {
 		dotImage.Distance = 40;
 		dotImage.DisplayDotImage(0);
 
-
+		
 		namedWindow("TestPicture", WINDOW_NORMAL);
 
 		while (cvWaitKey(0) != 'c') {
@@ -114,7 +125,7 @@ int main(int argc, char* argv[]) {
 
 			highThresholdBinary = ImageHandler::MakeBinary(frameGrey, HIGH_THRESHOLD);
 
-			ObjectAnalyser RoI[100];
+			ObjectAnalyser RoI[50];
 			int RoICounter = 1;
 
 			for (int i = 0; i < frameBinary->width*frameBinary->height; i++) {

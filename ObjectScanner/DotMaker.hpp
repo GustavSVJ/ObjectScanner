@@ -15,6 +15,7 @@ public:
 
 	void DisplayBlackImage();
 	void DisplayDotImage(int offset);
+	void DisplayColorImage(CvScalar color);
 
 	IplImage *img;
 };

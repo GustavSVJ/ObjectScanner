@@ -13,7 +13,6 @@ namespace fs = std::experimental::filesystem;
 
 OutputHandler::OutputHandler()
 {
-	memset(points, NULL, MAX_OUTPUT_POINTS);
 	pointCounter = 0;
 	imageCounter = 0;
 }
