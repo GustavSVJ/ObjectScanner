@@ -14,7 +14,7 @@
 
 
 
-#define HIGH_THRESHOLD 30
+#define HIGH_THRESHOLD 25
 #define COLOR_THRESHOLD 25
 #define LOW_THRESHOLD 5
 #define BACKGROUND_THRESHOLD 25
@@ -22,7 +22,7 @@
 #define offset 0.3f
 #define BottomGreen 13.6f
 #define PICTURE_PR_MOVE 2
-int X_distance = 0;
+#define X_DISTANCE_PER_MOVE 0.2f
 
 int temp_index = 0;
 double Xsort_ref[100];
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 		dotImage.Distance = 40;
 		dotImage.DisplayDotImage(0);
 
-		
+
 		namedWindow("TestPicture", WINDOW_NORMAL);
 
 		while (cvWaitKey(0) != 'c') {
@@ -349,9 +349,20 @@ int main(int argc, char* argv[]) {
 
 			}
 
-			if (greenRoICounter != 2 || (greenRoICounter + redRoICounter + blueRoICounter < 24 || greenRoICounter + redRoICounter + blueRoICounter > 25)) {
-				printf("Error in picture %d", (PICTURE_PR_MOVE + 1) * moveX + moveY + 1);
+			/*
+			if (moveY == 1) {
+				if (greenRoICounter != 2 || (greenRoICounter + redRoICounter + blueRoICounter) != 25) {
+					printf("Error in picture %d\n", (PICTURE_PR_MOVE + 1) * moveX + moveY + 1);
+					continue;
+				}
 			}
+			else {
+				if (greenRoICounter != 2 || (greenRoICounter + redRoICounter + blueRoICounter) != 24) {
+					printf("Error in picture %d\n", (PICTURE_PR_MOVE + 1) * moveX + moveY + 1);
+					continue;
+				}
+			}
+			*/
 
 			if (greenRoICounter == 2) {
 
@@ -395,42 +406,60 @@ int main(int argc, char* argv[]) {
 
 					for (int j = 0; j < 100; j++) {
 						Xsort_ref[j] = Xsort[0];
-						hej.init_Height(0.52, 0.26, 0.00517, 0.000002677);
+						hej.init_Height(0.65, 0.25, 0.0123, 0.000002677);
 						hej.Reference_Calc(Xsort[0], j);
 					}
 
+					/*
+					if (moveY == 0) {
+						for (int i = 0; i < 49; i++) {
+							//printf("y %lf |", Ysort[i]);
+							//printf("x %lf |", Xsort[i]);
+							//printf("Z %lf\n", Zsort[i]);
+							if (i % 2 == 0) {
+								fileSaver.AddPoint(0, Y_distanceprpoint * i + offset * moveY, 0);
+							}
+							else {
+								fileSaver.AddPoint(0, Y_distanceprpoint * (i - 1) + offset * moveY, 0);
+							}
+						}
+					}
+					*/
 
 				}
+				else {
 
-				// Beregner Z for alle punkter 
-				double Zsort[80] = { 0.0 };
-				//if (moveX != 0) {
-				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
-					Zsort[i] = hej.CalcObjectHeight(Xsort[i], Xsort_ref[moveY * (greenRoICounter + redRoICounter + blueRoICounter) + i], i);
-				}
-				//}
+					// Beregner Z for alle punkter 
+					double Zsort[80] = { 0.0 };
+					//if (moveX != 0) {
+					for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
+						Zsort[i] = hej.CalcObjectHeight(Xsort[i], Xsort_ref[moveY * (greenRoICounter + redRoICounter + blueRoICounter) + i], i);
+					}
+					//}
 
-				//if (moveX % PICTURE_PR_MOVE == 0) {
-					//X_distance++;
-				//}
-				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
-					Xsort[i] = moveX;
-					if (i == 0)
-						Ysort[i] = 0;
-					else if (moveY == 0)
-						Ysort[i] = Y_distanceprpoint * i + offset * moveY;
-					else
-						Ysort[i] = Y_distanceprpoint * (i - 1) + offset * moveY;
+					//if (moveX % PICTURE_PR_MOVE == 0) {
+						//X_distance++;
+					//}
+					for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
+						Xsort[i] = moveX * X_DISTANCE_PER_MOVE;
+						if (i == 0)
+							Ysort[i] = 0;
+						else if (moveY == 0)
+							Ysort[i] = Y_distanceprpoint * i + offset * moveY;
+						else
+							Ysort[i] = Y_distanceprpoint * (i - 1) + offset * moveY;
 
-					Zsort[i] = Zsort[i] * 100;
-				}
+						Zsort[i] = Zsort[i] * 100;
+					}
 
 
-				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
-					//printf("y %lf |", Ysort[i]);
-					//printf("x %lf |", Xsort[i]);
-					//printf("Z %lf\n", Zsort[i]);
-					fileSaver.AddPoint(Xsort[i], Ysort[i], Zsort[i]);
+					for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
+						//printf("y %lf |", Ysort[i]);
+						//printf("x %lf |", Xsort[i]);
+						//printf("Z %lf\n", Zsort[i]);
+						fileSaver.AddPoint(Xsort[i], Ysort[i], Zsort[i]);
+					}
+
 				}
 
 			}

@@ -7,7 +7,7 @@ using namespace std;
 void Heightcalc::init_Height(double lightToObject, double baseLine, double focalLength, double aftandPrPixel) {
 	LightToObject = lightToObject;
 	Baseline = baseLine;
-	FocalLength = focalLength * 0.887;
+	FocalLength = focalLength;
 	AfstandPrPixel = aftandPrPixel;
 }
 
