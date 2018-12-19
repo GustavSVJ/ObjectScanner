@@ -29,8 +29,8 @@ double Xsort_ref[100];
 using namespace cv;
 using namespace std;
 
-enum InputType { Camera, File };
-enum Direction { North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest };
+enum InputType { Camera , File };
+enum Direction { North , NorthEast , East , SouthEast , South , SouthWest , West , NorthWest };
 int checkPixel(IplImage *inputImage, IplImage *outputImage, int pixelToCheck);
 
 

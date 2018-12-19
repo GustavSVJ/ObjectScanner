@@ -299,12 +299,12 @@ void ObjectAnalyser::SortingArray(double yRed[], double yBlue[], double yGreen[]
 				G++;
 				i++;
 				c = 1;
-				/*if (picturecounter == 0) {
+				if (picturecounter == 0) {
 					c = 1;
 				}
 				else {
 					c = 2;
-				}*/
+				}
 
 				break;
 			}
