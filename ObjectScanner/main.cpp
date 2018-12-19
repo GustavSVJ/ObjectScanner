@@ -400,7 +400,7 @@ int main(int argc, char* argv[]) {
 			double Ysort[80] = { 0.0 };
 			double Xsort[80] = { 0.0 };
 			// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
-			ObjectAnalyser::SortingArray(Yred, Yblue, Ygreen, Ysort, Xred, Xblue, Xgreen, Xsort, 0);
+			ObjectAnalyser::SortingArray(Yred, Yblue, Ygreen, Ysort, Xred, Xblue, Xgreen, Xsort, moveY);
 
 			// Udskrivning af test af sorteringsfunktion
 
