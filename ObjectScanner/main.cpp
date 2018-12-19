@@ -349,121 +349,115 @@ int main(int argc, char* argv[]) {
 
 			}
 
-			/*
-			if (moveY == 1) {
+
+			if (moveY != 0) {
 				if (greenRoICounter != 2 || (greenRoICounter + redRoICounter + blueRoICounter) != 25) {
 					printf("Error in picture %d\n", (PICTURE_PR_MOVE + 1) * moveX + moveY + 1);
+					cvReleaseImage(&frameInput);
+					cvReleaseImage(&frameColor);
+					cvReleaseImage(&frameGrey);
+					cvReleaseImage(&frameBinary);
+					cvReleaseImage(&objectMarkings);
+					cvReleaseImage(&strongColors);
+					cvReleaseImage(&highThresholdBinary);
 					continue;
 				}
 			}
 			else {
 				if (greenRoICounter != 2 || (greenRoICounter + redRoICounter + blueRoICounter) != 24) {
 					printf("Error in picture %d\n", (PICTURE_PR_MOVE + 1) * moveX + moveY + 1);
+					cvReleaseImage(&frameInput);
+					cvReleaseImage(&frameColor);
+					cvReleaseImage(&frameGrey);
+					cvReleaseImage(&frameBinary);
+					cvReleaseImage(&objectMarkings);
+					cvReleaseImage(&strongColors);
+					cvReleaseImage(&highThresholdBinary);
 					continue;
 				}
 			}
-			*/
-
-			if (greenRoICounter == 2) {
-
-				// Her må vi starte med at rette
-				double Xred[25] = { 0.0 };
-				double Yred[25] = { 0.0 };
-				// Her finder vi den absolutte X,Y position for prikken i billedet
-				ObjectAnalyser::FindXY(redRoI, redRoICounter, frameGrey, Xred, Yred);
 
 
-				double Xgreen[25] = { 0.0 };
-				double Ygreen[25] = { 0.0 };
 
-				// Her finder vi den absolutte X,Y position for prikken i billedet
-				ObjectAnalyser::FindXY(greenRoI, greenRoICounter, frameGrey, Xgreen, Ygreen);
-
-				double Xblue[25] = { 0.0 };
-				double Yblue[25] = { 0.0 };
-
-				// Her finder vi den absolutte X,Y position for prikken i billedet
-				ObjectAnalyser::FindXY(blueRoI, blueRoICounter, frameGrey, Xblue, Yblue);
-				double Ysort[80] = { 0.0 };
-				double Xsort[80] = { 0.0 };
-				// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
-				ObjectAnalyser::SortingArray(Yred, Yblue, Ygreen, Ysort, Xred, Xblue, Xgreen, Xsort, 0);
-
-				// Udskrivning af test af sorteringsfunktion
+			// Her må vi starte med at rette
+			double Xred[25] = { 0.0 };
+			double Yred[25] = { 0.0 };
+			// Her finder vi den absolutte X,Y position for prikken i billedet
+			ObjectAnalyser::FindXY(redRoI, redRoICounter, frameGrey, Xred, Yred);
 
 
-				// Test af højde bestemmelses funktionen
-				Heightcalc hej;
-				// Beregner referencer for alle prikker, første gang..
-				if (moveX == 0) {
-					/*for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
-						Xsort_ref[temp_index] = Xsort[i];
-						hej.init_Height(0.52, 0.26, 0.00517, 0.000002677);
-						hej.Reference_Calc(Xsort[i], temp_index);
-						temp_index++;
-						//printf("index = %d , K = %lf  ,  C = %lf  \n", i, hej.K[i], hej.C[i]);
-					}*/
+			double Xgreen[25] = { 0.0 };
+			double Ygreen[25] = { 0.0 };
 
-					for (int j = 0; j < 100; j++) {
-						Xsort_ref[j] = Xsort[0];
-						hej.init_Height(0.65, 0.25, 0.0123, 0.000002677);
-						hej.Reference_Calc(Xsort[0], j);
-					}
+			// Her finder vi den absolutte X,Y position for prikken i billedet
+			ObjectAnalyser::FindXY(greenRoI, greenRoICounter, frameGrey, Xgreen, Ygreen);
 
-					/*
-					if (moveY == 0) {
-						for (int i = 0; i < 49; i++) {
-							//printf("y %lf |", Ysort[i]);
-							//printf("x %lf |", Xsort[i]);
-							//printf("Z %lf\n", Zsort[i]);
-							if (i % 2 == 0) {
-								fileSaver.AddPoint(0, Y_distanceprpoint * i + offset * moveY, 0);
-							}
-							else {
-								fileSaver.AddPoint(0, Y_distanceprpoint * (i - 1) + offset * moveY, 0);
-							}
-						}
-					}
-					*/
+			double Xblue[25] = { 0.0 };
+			double Yblue[25] = { 0.0 };
 
-				}
-				else {
+			// Her finder vi den absolutte X,Y position for prikken i billedet
+			ObjectAnalyser::FindXY(blueRoI, blueRoICounter, frameGrey, Xblue, Yblue);
+			double Ysort[80] = { 0.0 };
+			double Xsort[80] = { 0.0 };
+			// Sorteringsfunktionen. Sorterer prikkerne efter farve, så de rigtige koordinater kommer i rækkefølge
+			ObjectAnalyser::SortingArray(Yred, Yblue, Ygreen, Ysort, Xred, Xblue, Xgreen, Xsort, 0);
 
-					// Beregner Z for alle punkter 
-					double Zsort[80] = { 0.0 };
-					//if (moveX != 0) {
-					for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
-						Zsort[i] = hej.CalcObjectHeight(Xsort[i], Xsort_ref[moveY * (greenRoICounter + redRoICounter + blueRoICounter) + i], i);
-					}
-					//}
-
-					//if (moveX % PICTURE_PR_MOVE == 0) {
-						//X_distance++;
-					//}
-					for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
-						Xsort[i] = moveX * X_DISTANCE_PER_MOVE;
-						if (i == 0)
-							Ysort[i] = 0;
-						else if (moveY == 0)
-							Ysort[i] = Y_distanceprpoint * i + offset * moveY;
-						else
-							Ysort[i] = Y_distanceprpoint * (i - 1) + offset * moveY;
-
-						Zsort[i] = Zsort[i] * 100;
-					}
+			// Udskrivning af test af sorteringsfunktion
 
 
-					for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
-						//printf("y %lf |", Ysort[i]);
-						//printf("x %lf |", Xsort[i]);
-						//printf("Z %lf\n", Zsort[i]);
-						fileSaver.AddPoint(Xsort[i], Ysort[i], Zsort[i]);
-					}
+			// Test af højde bestemmelses funktionen
+			Heightcalc hej;
+			// Beregner referencer for alle prikker, første gang..
+			if (moveX == 0) {
+				/*for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
+					Xsort_ref[temp_index] = Xsort[i];
+					hej.init_Height(0.52, 0.26, 0.00517, 0.000002677);
+					hej.Reference_Calc(Xsort[i], temp_index);
+					temp_index++;
+					//printf("index = %d , K = %lf  ,  C = %lf  \n", i, hej.K[i], hej.C[i]);
+				}*/
 
+				for (int j = 0; j < 100; j++) {
+					Xsort_ref[j] = Xsort[0];
+					hej.init_Height(0.65, 0.25, 0.0123, 0.000002677);
+					hej.Reference_Calc(Xsort[0], j);
 				}
 
 			}
+			else {
 
+				// Beregner Z for alle punkter 
+				double Zsort[80] = { 0.0 };
+				//if (moveX != 0) {
+				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
+					Zsort[i] = hej.CalcObjectHeight(Xsort[i], Xsort_ref[moveY * (greenRoICounter + redRoICounter + blueRoICounter) + i], i);
+				}
+				//}
+
+				//if (moveX % PICTURE_PR_MOVE == 0) {
+					//X_distance++;
+				//}
+				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
+					Xsort[i] = moveX * X_DISTANCE_PER_MOVE;
+					if (i == 0)
+						Ysort[i] = 0;
+					else if (moveY == 0)
+						Ysort[i] = Y_distanceprpoint * i + offset * moveY;
+					else
+						Ysort[i] = Y_distanceprpoint * (i - 1) + offset * moveY;
+
+					Zsort[i] = Zsort[i] * 100;
+				}
+
+
+				for (int i = 0; i < (greenRoICounter + redRoICounter + blueRoICounter); i++) {
+					//printf("y %lf |", Ysort[i]);
+					//printf("x %lf |", Xsort[i]);
+					//printf("Z %lf\n", Zsort[i]);
+					fileSaver.AddPoint(Xsort[i], Ysort[i], Zsort[i]);
+				}
+
+			}
 
 			cvReleaseImage(&img);
 			cvReleaseImage(&frameInput);
